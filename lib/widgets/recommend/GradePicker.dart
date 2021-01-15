@@ -91,7 +91,7 @@ class _GradePickerState extends State<GradePicker> {
             child: Container(
               width: ScreenUtil().setWidth(ScreenUtil.screenWidth),
               color: Color(0xFFF0F0F0),
-              child: BookList(countCallBack: changeCount,),
+              child: BookList(countCallBack: changeCount),
             ),
           ),
           Container(
@@ -220,45 +220,43 @@ class _GradePickerState extends State<GradePicker> {
                                 }).toList(),
                               )
                           ),
-                          secondChild: Expanded(
-                            child: Container(
-                              height: 190,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.zero,
-                                      topRight: Radius.zero,
-                                      bottomLeft: Radius.circular(10),
-                                      bottomRight: Radius.circular(10)
-                                  )
-                              ),
-                              child: Wrap(
-                                children: kindData.map((item){
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    child: FlatButton(
-                                      minWidth: 60,
-                                      shape: RoundedRectangleBorder(
-                                          side: BorderSide.none,
-                                          borderRadius: BorderRadius.all(Radius.circular(15))
-                                      ),
-                                      child: Text(
-                                          item,
-                                          style: TextStyle(color: Colors.black, fontSize: 12)),
-                                      color: Color(0xFFF0F0F0),
-                                      onPressed: () {
-                                        setState(() {
-                                          kindSet = item;
-                                          chooseVisible = false;
-                                          secondBtn = false;
-                                        });
-                                      },
+                          secondChild: Container(
+                            height: 190,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.zero,
+                                    topRight: Radius.zero,
+                                    bottomLeft: Radius.circular(10),
+                                    bottomRight: Radius.circular(10)
+                                )
+                            ),
+                            child: Wrap(
+                              children: kindData.map((item){
+                                return Container(
+                                  margin: EdgeInsets.all(5),
+                                  child: FlatButton(
+                                    minWidth: 60,
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide.none,
+                                        borderRadius: BorderRadius.all(Radius.circular(15))
                                     ),
-                                  );
-                                }).toList(),
-                              ),
+                                    child: Text(
+                                        item,
+                                        style: TextStyle(color: Colors.black, fontSize: 12)),
+                                    color: Color(0xFFF0F0F0),
+                                    onPressed: () {
+                                      setState(() {
+                                        kindSet = item;
+                                        chooseVisible = false;
+                                        secondBtn = false;
+                                      });
+                                    },
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ),
                         ),

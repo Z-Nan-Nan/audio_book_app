@@ -8,6 +8,7 @@ class ShoppingBag extends StatefulWidget {
 }
 
 class _ShoppingBagState extends State<ShoppingBag> {
+  List <Books> booksList = [];
   bool chooseAll = true;
   @override
   Widget build(BuildContext context) {

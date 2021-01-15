@@ -18,6 +18,7 @@ class _ArticleState extends State<Article> {
   List<dynamic> Passages = [];
   String title = '';
   int like = 0;
+  String newComment = '';
   int readNum = 0;
   bool isLike = false;
   bool isHot = true;
@@ -51,7 +52,14 @@ class _ArticleState extends State<Article> {
             readNum = res.data['article']['read_num'];
             var arr = [];
             for (var i in res.data['article']['comment']) {
-              arr.add(CommentVector.fromJSON(i));
+              if (i['top']) {
+                arr.add(CommentVector.fromJSON(i));
+              }
+            }
+            for (var i in res.data['article']['comment']) {
+              if (!i['top']) {
+                arr.add(CommentVector.fromJSON(i));
+              }
             }
             commentList = arr;
           });
@@ -402,6 +410,30 @@ class _ArticleState extends State<Article> {
                         ),
                         Text('       写留言', style: TextStyle(color: Color(0xFF282828), fontSize: 18, fontWeight: FontWeight.w600)),
                         GestureDetector(
+                          onTap: () async{
+                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                            var articleId = '';
+                            for (var i in cookies) {
+                              if (i.name == 'article') {
+                                articleId = i.value;
+                              }
+                            }
+                            var result = await HttpUtils.request(
+                              '/send_new_comment',
+                              method: 'post',
+                              data: {
+                                'r_id': cookies[0].value,
+                                'a_id': articleId,
+                                'comment': newComment
+                              }
+                            );
+                            var res = DataTransfer.fromJSON(result);
+                            if (res.status == 1) {
+                              setState(() {
+                                textFieldVisible = false;
+                              });
+                            }
+                          },
                           child: Container(
                             width: 68,
                             height: 30,
@@ -412,6 +444,11 @@ class _ArticleState extends State<Article> {
                       ],
                     ),
                     TextField(
+                      onChanged: (val){
+                        setState((){
+                          newComment = val;
+                        });
+                      },
                       maxLines: 8,
                       showCursor: true,
                       cursorWidth: 3,
@@ -419,6 +456,10 @@ class _ArticleState extends State<Article> {
                       cursorColor: Color(0xFF00B4AA),
                       keyboardType: TextInputType.multiline,
                       textInputAction: TextInputAction.unspecified,
+                      style: TextStyle(
+                        color: Color(0xFF646464),
+                        letterSpacing: 1
+                      ),
                       decoration: InputDecoration(
                         border: InputBorder.none
                       ),

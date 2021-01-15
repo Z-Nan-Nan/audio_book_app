@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
 import 'package:audio_book_app/widgets/recommend/ListData_test.dart';
+
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class BookList extends StatefulWidget {
   final ValueChanged<int> countCallBack;
@@ -36,6 +40,34 @@ class MyCustomPainter extends CustomPainter {
 }
 
 class _BookListState extends State<BookList> {
+  List <Books> booksList = [];
+  int vocCount = 0;
+  @override
+  void initState() {
+    void getGroupList(cookie) async {
+      var result = await HttpUtils.request(
+          '/get_book_grouplist',
+          method: HttpUtils.POST,
+          data: {
+            'r_id': cookie.value
+          }
+      );
+      var res = DataTransfer.fromJSON(result);
+      setState(() {
+        vocCount = res.data['voc_count'];
+        for (var i in res.data['list']) {
+          print(i);
+          booksList.add(Books.fromJSON(i));
+        }
+      });
+    }
+    void getCookie() async {
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      getGroupList(cookies[0]);
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -56,7 +88,7 @@ class _BookListState extends State<BookList> {
                     ),
                   ),
                   SizedBox(width: 5),
-                  Text('你的词汇量：18376', style: TextStyle(color: Color(0xFF646464), fontSize: 14))
+                  Text('你的词汇量：${vocCount}', style: TextStyle(color: Color(0xFF646464), fontSize: 14))
                 ],
               )
             ],
@@ -64,7 +96,7 @@ class _BookListState extends State<BookList> {
         ),
         Column(
           children: booksList.map((item){
-            return InkWell(
+            return GestureDetector(
               onTap: (){
                 Navigator.pushNamed(context, '/courseInfo');
               },
@@ -158,14 +190,13 @@ class _BookListState extends State<BookList> {
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
                                       Text('书单目录',style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 14),),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: item.lists.map((i){
-                                            return Text(i, style: TextStyle(color: Color(0xFF282828), fontSize: 14));
-                                          }).toList(),
-                                        ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: item.lists.map((i){
+                                          return Text(i['name_cn'], style: TextStyle(color: Color(0xFF282828), fontSize: 14));
+                                        }).toList(),
                                       ),
+                                      SizedBox(height: 10),
                                       Container(
                                         width: 90,
                                         height: 30,
@@ -176,7 +207,7 @@ class _BookListState extends State<BookList> {
                                         child: Row(
                                           children: [
                                             CircleAvatar(
-                                              backgroundColor: Colors.yellow,
+                                                backgroundImage: NetworkImage(item.avatar)
                                             ),
                                             SizedBox(width: 2),
                                             Text('书单主理人： ${item.manager}', style: TextStyle(color: Color(0xFF282828), fontSize: 12),)
@@ -193,7 +224,7 @@ class _BookListState extends State<BookList> {
                               children: [
                                 Column(
                                   children: [
-                                    Image.asset(item.images, width: 108, height: 165)
+                                    Image.network(item.images, width: 108, height: 165)
                                     // Container(
                                     //   height: 165,
                                     //   width: 108,
