@@ -3,17 +3,19 @@ import 'package:audio_book_app/tools/MyUnderlineIndecator.dart';
 import 'dart:async';
 import 'CommentList.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:audio_book_app/widgets/commons/book.dart';
 import 'CountStar.dart';
 
 class CourseDetail extends StatefulWidget {
+  CourseDetail({Key key, this.renderDetail}): super (key:key);
+  var renderDetail = [];
   @override
   _CourseDetailState createState() => _CourseDetailState();
 }
 
 class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
 
-  List _courseTab = ['小王子', '纳尼亚传奇', '黑骏马', '傲慢与偏见'];
-  List<String> tagData = ['最佳中篇奖', '追授“雨果奖”最佳中篇', '浅荷年度最佳中篇', '浅荷2020年最受欢迎书单'];
+  List _courseTab = [];
   int audioTime = 60;
   bool isPlay = false;
   double finish = 0;
@@ -25,6 +27,15 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
   bool get wantKeepAlive => true;
   @override
   void initState() {
+    print(widget.renderDetail);
+    for (var item in widget.renderDetail) {
+      if (item['rate'] is int) {
+        item['rate'] = double.parse(item['rate'].toString());
+      }
+      setState(() {
+        _courseTab.add(item);
+      });
+    }
     super.initState();
     _tabController = null;
     _tabController = TabController(
@@ -47,7 +58,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
             labelColor: Color(0xFF00B4AA),
             tabs: _courseTab.map((value) {
               return Center(
-                  child: new Text(value)
+                  child: new Text(value['name_cn'])
               );
             }).toList(),
             unselectedLabelColor: Color(0xFF282828),
@@ -65,7 +76,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                   return SingleChildScrollView(
                       child: Container(
                         width: ScreenUtil().setWidth(ScreenUtil.screenWidth),
-                        padding: EdgeInsets.only(left: 28, right: 21),
+                        padding: EdgeInsets.only(left: 26, right: 21),
                         color: Color(0xFFFFFF),
                         child: Column(
                           children: [
@@ -78,21 +89,17 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 88,
-                                    height: 132,
-                                    color: Colors.yellowAccent,
-                                  ),
+                                  Book(height: 132, coverUrl: '${item['img_src']}'),
                                   SizedBox(width: ScreenUtil().setWidth(ScreenUtil.screenWidth) * 0.03),
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('小王子', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                                      Text('${item['name_cn']}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                                       SizedBox(height: 6),
                                       Container(
                                         width: ScreenUtil().setWidth(ScreenUtil.screenWidth) * 0.16,
-                                        child: Text('[法]安东尼·德·圣-埃克苏佩里/1942年出版/1942年出版1942年出版', style: TextStyle(fontSize: 12, color: Color(0xFF646464))),
+                                        child: Text('${item['author']}', style: TextStyle(fontSize: 12, color: Color(0xFF646464))),
                                       ),
                                       SizedBox(height: 11),
                                       Row(
@@ -112,7 +119,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                                             ),
                                           ),
                                           SizedBox(width: 2),
-                                          CountStar(star: 4.5, starColor: 'gold')
+                                          CountStar(star: item['rate'], starColor: 'gold')
                                         ],
                                       ),
                                       SizedBox(height: 16),
@@ -143,7 +150,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                               children: [
                                 Container(
                                   width: 325,
-                                  child: Text('作者以小王子的孩子式的眼光，透视出成人的空虚、盲目，愚妄和死板教条，用浅显天真的语言写出了人类的孤独寂寞、没有根基随风流浪的命运。同时，也表达出作者对金钱关系的批判，对真善美的讴歌。', style: TextStyle(color: Color(0xFF282828), fontSize: 14),),
+                                  child: Text('${item['book_desc']}', style: TextStyle(color: Color(0xFF282828), fontSize: 14),),
                                 )
                               ],
                             ),
@@ -151,7 +158,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                             Container(
                               width: 325,
                               child: Wrap(
-                                children: tagData.map((item) {
+                                children: item['tags'].map<Widget>((item) {
                                   return Container(
                                     height: 30,
                                     margin: EdgeInsets.only(top: 3, bottom: 3, right: 12),
@@ -159,7 +166,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                                     decoration: BoxDecoration(
                                       border: Border.all(width: 2, color: Color(0xFFF0F0F0)),
                                     ),
-                                    child: Text(item, style: TextStyle(fontSize: 12),),
+                                    child: Text('${item}', style: TextStyle(fontSize: 12),),
                                   );
                                 }).toList(),
                               ),
@@ -259,7 +266,7 @@ class _CourseDetailState extends State<CourseDetail> with TickerProviderStateMix
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CommentList()
+                                  CommentList(list: item['hot_comments'])
                                 ],
                               ),
                             )

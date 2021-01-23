@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class Achievement extends StatefulWidget {
   @override
@@ -7,6 +11,26 @@ class Achievement extends StatefulWidget {
 }
 
 class _AchievementState extends State<Achievement> {
+  var renderObject = {};
+  @override
+  void initState() {
+    void getRenderInfo(cookie) async{
+      var result = await HttpUtils.request(
+        '/get_person_info?r_id=$cookie',
+        method: HttpUtils.GET
+      );
+      var res = DataTransfer.fromJSON(result);
+      setState(() {
+        renderObject = res.data;
+      });
+    }
+    void getCookie() async{
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      getRenderInfo(cookies[0].value);
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 375, height: 731)..init(context);
@@ -30,10 +54,10 @@ class _AchievementState extends State<Achievement> {
                     Container(
                       width: 30,
                       height: 30,
-                      decoration: BoxDecoration(color: Colors.lightGreen, borderRadius: BorderRadius.all(Radius.circular(15))),
+                      decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('${renderObject['avatar']}'), fit: BoxFit.cover), borderRadius: BorderRadius.all(Radius.circular(15))),
                     ),
                     SizedBox(width: 10),
-                    Text('红拂夜奔', style: TextStyle(color: Color(0xFF282828), fontSize: 18, fontWeight: FontWeight.w600))
+                    Text('${renderObject['nickname']}', style: TextStyle(color: Color(0xFF282828), fontSize: 18, fontWeight: FontWeight.w600))
                   ],
                 ),
                 GestureDetector(
@@ -58,7 +82,7 @@ class _AchievementState extends State<Achievement> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('996688', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
+                    Text('${renderObject['info_detail']['all_words']}', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
                     SizedBox(width: 6),
                     Text('字', style: TextStyle(color: Color(0xFF646464))),
                     Container(
@@ -69,7 +93,7 @@ class _AchievementState extends State<Achievement> {
                         color: Color(0xFFDCDCDC),
                       ),
                     ),
-                    Text('567', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
+                    Text('${renderObject['info_detail']['days']}', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
                     SizedBox(width: 6),
                     Text('天', style: TextStyle(color: Color(0xFF646464))),
                   ],
@@ -89,7 +113,7 @@ class _AchievementState extends State<Achievement> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('10215', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
+                    Text('${renderObject['info_detail']['now_voc']}', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w600, fontStyle: FontStyle.italic)),
                     SizedBox(width: 20)
                   ],
                 )

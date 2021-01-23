@@ -15,7 +15,6 @@ class Today extends StatefulWidget {
 
 class _TodayState extends State<Today> {
   bool isMintFinished = true;
-
   List<Course> courses = [];
   int rightQuestion = 0;
   int week = 0;

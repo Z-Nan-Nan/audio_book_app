@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'CommentList.dart';
 import 'package:audio_book_app/widgets/recommend/CourseDetail.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
+import 'CountStar.dart';
 
 class CourseInfo extends StatefulWidget {
   @override
@@ -24,7 +28,35 @@ class _CourseInfoState extends State<CourseInfo> {
   double finish = 0;
   double unFinish = 130;
   Timer _timer;
+  var renderObj = {};
 
+  @override
+  void initState() {
+    void getCourseDetail(cookie, id) async {
+      print(cookie.value);
+      var result = await HttpUtils.request(
+        '/get_course_info_detail?r_id=${cookie.value}&group_id=$id',
+        method: HttpUtils.GET
+      );
+      var res = DataTransfer.fromJSON(result);
+      print(res.data);
+      setState(() {
+        renderObj = res.data;
+      });
+    }
+    void getCookie() async {
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      var id = '';
+      for (var i in cookies) {
+        if (i.name == 'is_visit_book_group') {
+          id = i.value;
+        }
+      }
+      getCourseDetail(cookies[0], id);
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 375, height: 731)..init(context);
@@ -49,7 +81,46 @@ class _CourseInfoState extends State<CourseInfo> {
                   physics: firstVisible ? new NeverScrollableScrollPhysics() : null,
                   child: Column(
                     children: [
-                      Image.asset('images/course_top.png', width: ScreenUtil().setWidth(ScreenUtil.screenWidth)),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 230,
+                        decoration: BoxDecoration(image: DecorationImage(image: NetworkImage(renderObj['sell_src']), fit: BoxFit.cover)),
+                        padding: EdgeInsets.only(top: 80, left: 20, right: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${renderObj['name']}', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w500)),
+                            SizedBox(height: 1),
+                            Text('${renderObj['tag_cn']}', style: TextStyle(color: Colors.white60)),
+                            SizedBox(height: 1),
+                            Text('建议18岁以上人群阅读', style: TextStyle(color: Colors.white60, fontSize: 12)),
+                            SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(color: Color(0xFF00C600), borderRadius: BorderRadius.all(Radius.circular(2))),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('豆', style: TextStyle(color: Colors.white, fontSize: 8))
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: 2),
+                                CountStar(star: renderObj['rate'], starColor: 'gold'),
+                                SizedBox(width: 2),
+                                Text('${renderObj['rate']}', style: TextStyle(fontSize: 12, color: Colors.white60))
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                       Container(
                         padding: EdgeInsets.only(left: ScreenUtil().setWidth(ScreenUtil.screenWidth) * 0.03, top: 10, bottom: 10, right: 27),
                         width: ScreenUtil().setWidth(ScreenUtil.screenWidth),
@@ -65,10 +136,12 @@ class _CourseInfoState extends State<CourseInfo> {
                                   borderRadius: BorderRadius.all(Radius.circular(12)),
                                   border: Border.all(width: 1, color: Color(0xFFDCDCDC))
                               ),
-                              child: Text('第77期', style: TextStyle(color: Color(0xFF646464), fontSize: 14),),
+                              child: Center(
+                                child: Text('第${renderObj['term']}期', style: TextStyle(color: Color(0xFF646464), fontSize: 14)),
+                              ),
                             ),
                             SizedBox(width: 14),
-                            Text('开课：03月06日 - 结课：09月06日', style: TextStyle(color: Color(0xFF646464), fontSize: 14),)
+                            Text('${renderObj['date_cn']}', style: TextStyle(color: Color(0xFF646464), fontSize: 14),)
                           ],
                         ),
                       ),
@@ -81,7 +154,7 @@ class _CourseInfoState extends State<CourseInfo> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('经典级', style: TextStyle(color: Color(0xFF282828), fontSize: 18)),
+                                Text('${renderObj['grade_cn']}', style: TextStyle(color: Color(0xFF282828), fontSize: 18)),
                                 SizedBox(height: 6),
                                 Text('级别', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12))
                               ],
@@ -90,7 +163,7 @@ class _CourseInfoState extends State<CourseInfo> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('4500以上', style: TextStyle(color: Color(0xFF282828), fontSize: 18)),
+                                Text('${renderObj['fit_voc']}以上', style: TextStyle(color: Color(0xFF282828), fontSize: 18)),
                                 SizedBox(height: 3),
                                 Row(
                                   children: [
@@ -104,7 +177,9 @@ class _CourseInfoState extends State<CourseInfo> {
                                           borderRadius: BorderRadius.all(Radius.circular(12)),
                                           border: Border.all(width: 1, color: Color(0xFFDCDCDC))
                                       ),
-                                      child: Text('不匹配', style: TextStyle(color: Color(0xFFE02020), fontSize: 12),),
+                                      child: Center(
+                                        child: Text('${renderObj['is_fit'] ? '匹配' : '不匹配'}', style: TextStyle(color: renderObj['is_fit'] ? Colors.lightGreen : Color(0xFFE02020), fontSize: 12)),
+                                      ),
                                     ),
                                     SizedBox(width: 7),
                                     InkWell(
@@ -149,7 +224,7 @@ class _CourseInfoState extends State<CourseInfo> {
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(25)), color: Colors.pink),
+                                  borderRadius: BorderRadius.all(Radius.circular(25)), image: DecorationImage(image: NetworkImage('${renderObj['avatar']}'), fit: BoxFit.cover,)),
                             ),
                             SizedBox(width: 10),
                             Column(
@@ -157,7 +232,7 @@ class _CourseInfoState extends State<CourseInfo> {
                               children: [
                                 Row(
                                   children: [
-                                    Text('Bill', style: TextStyle(color: Color(0xFF282828), fontSize: 16),),
+                                    Text('${renderObj['editor']}', style: TextStyle(color: Color(0xFF282828), fontSize: 16),),
                                     SizedBox(width: 6),
                                     Container(
                                       width: 74,
@@ -174,7 +249,7 @@ class _CourseInfoState extends State<CourseInfo> {
                                 SizedBox(height: 12),
                                 Row(
                                   children: [
-                                    Text('北京大学 语言学博士', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12),)
+                                    Text('${renderObj['job']}', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12),)
                                   ],
                                 )
                               ],
@@ -192,8 +267,7 @@ class _CourseInfoState extends State<CourseInfo> {
                             SizedBox(width: 12),
                             Container(
                               width: 320,
-                              height: 120,
-                              child: Text('《小王子（中英文对照本）》是2001年哈尔滨出版社出版的图书，作者是法国安东·德·圣艾修伯里。小说讲述了一个因飞机失事而滞留而滞留而，小说讲述了一个因飞机失事而滞留而滞留而小说讲述了一个因飞机失事而滞留而滞留而小说讲述了一个因飞机失事而滞留而滞留而小说讲述了一个。',
+                              child: Text('${renderObj['group_desc']}',
                                 style: TextStyle(color: Color(0xFF282828), fontSize: 14),),
                             )
                           ],
@@ -203,46 +277,59 @@ class _CourseInfoState extends State<CourseInfo> {
                       Container(
                         width: 355,
                         height: 56,
-                        padding: EdgeInsets.only(left: 30, top: 5),
+                        padding: EdgeInsets.only(left: 30, top: 5, right: 30),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             color: Color(0xFFF0F0F0).withOpacity(0.5)
                         ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.blue),
-                            ),
-                            SizedBox(width: 5),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 5),
-                                Text('内容策划', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12)),
-                                SizedBox(height: 3),
-                                Text('JeffersonJeffers', style: TextStyle(color: Color(0xFF282828), fontSize: 14, fontWeight: FontWeight.w600),)
-                              ],
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(15)), image: DecorationImage(image: NetworkImage('${renderObj['content_men']['avatar']}'), fit: BoxFit.cover)),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 5),
+                                      Text('内容策划', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12)),
+                                      SizedBox(height: 3),
+                                      Text('${renderObj['content_men']['men']}', style: TextStyle(color: Color(0xFF282828), fontSize: 14, fontWeight: FontWeight.w600),)
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             SizedBox(width: 22),
                             Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.yellow),
-                            ),
-                            SizedBox(width: 5),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 5),
-                                Text('讲义编辑', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12)),
-                                SizedBox(height: 3),
-                                Text('Jefferson', style: TextStyle(color: Color(0xFF282828), fontSize: 14, fontWeight: FontWeight.w600),)
-                              ],
-                            ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(15)), image: DecorationImage(image: NetworkImage('${renderObj['para_men']['avatar']}'), fit: BoxFit.cover)),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 5),
+                                      Text('讲义编辑', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 12)),
+                                      SizedBox(height: 3),
+                                      Text('${renderObj['para_men']['men']}', style: TextStyle(color: Color(0xFF282828), fontSize: 14, fontWeight: FontWeight.w600),)
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -292,7 +379,7 @@ class _CourseInfoState extends State<CourseInfo> {
                       // )
                       SizedBox(
                         height: 470,
-                        child: CourseDetail(),
+                        child: CourseDetail(renderDetail: renderObj['books_detail'],),
                       ),
                       Container(
                         width: ScreenUtil().setWidth(ScreenUtil.screenWidth),
@@ -430,7 +517,7 @@ class _CourseInfoState extends State<CourseInfo> {
                         )
                       ]
                   ),
-                  child: Text('文案不超过五十个字哦文案不超过五十个字哦文案不超过五十个字哦文案不超过五十个字哦文案不超过五十个字哦', style: TextStyle(color: Color(0xFF646464), fontSize: 12),),
+                  child: Text('入门级为0至3800词，经典级为3800至6000词，进阶级为6000词8000词，高阶为8000词以上', style: TextStyle(color: Color(0xFF646464), fontSize: 12),),
                 ),
               ),
             )

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'package:audio_book_app/net/api.dart';
 import 'package:audio_book_app/widgets/recommend/ListData_test.dart';
 
@@ -42,6 +43,22 @@ class MyCustomPainter extends CustomPainter {
 class _BookListState extends State<BookList> {
   List <Books> booksList = [];
   int vocCount = 0;
+  sendShoppingCartInfo(id, buy) async {
+    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+    var result = await HttpUtils.request(
+        '/post_shoppingcart_info',
+        method: HttpUtils.POST,
+        data: {
+          'rId': cookies[0].value,
+          'groupId': id,
+          'buy': buy
+        }
+    );
+    var res = DataTransfer.fromJSON(result);
+    if (res.status == 1) {
+      print('操作成功');
+    }
+  }
   @override
   void initState() {
     void getGroupList(cookie) async {
@@ -60,6 +77,13 @@ class _BookListState extends State<BookList> {
           booksList.add(Books.fromJSON(i));
         }
       });
+      var count = 0;
+      for (var i in booksList) {
+        if (i.buy) {
+          count++;
+        }
+      }
+      widget.countCallBack(count);
     }
     void getCookie() async {
       List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
@@ -97,7 +121,19 @@ class _BookListState extends State<BookList> {
         Column(
           children: booksList.map((item){
             return GestureDetector(
-              onTap: (){
+              onTap: ()async{
+                List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                bool flag = true;
+                for (var i in cookies) {
+                  if (i.name == 'is_visit_book_group') {
+                    flag = false;
+                    i.value = item.groupId;
+                  }
+                }
+                if (flag) {
+                  cookies.add(new Cookie('is_visit_book_group', item.groupId));
+                  (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                }
                 Navigator.pushNamed(context, '/courseInfo');
               },
               child: Column(
@@ -158,6 +194,7 @@ class _BookListState extends State<BookList> {
                                       }
                                     }).toList();
                                     widget.countCallBack(num);
+                                    sendShoppingCartInfo(item.groupId, item.buy);
                                   },
                                 ),
                                 SizedBox(width: 10)

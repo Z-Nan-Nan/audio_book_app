@@ -2,12 +2,25 @@ import 'package:flutter/material.dart';
 import 'CommentData_test.dart';
 import 'CountStar.dart';
 
+
 class CommentList extends StatefulWidget {
+  CommentList({Key key, this.list}) : super (key: key);
+  List list;
   @override
   _CommentListState createState() => _CommentListState();
 }
 
 class _CommentListState extends State<CommentList> {
+  List <Comment> comments = [];
+  @override
+  void initState() {
+    for (var item in widget.list) {
+      setState(() {
+        comments.add(Comment.fromJSON(item));
+      });
+    }
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Column(

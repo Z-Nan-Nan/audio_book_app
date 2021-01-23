@@ -1,5 +1,10 @@
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
 import 'package:flutter/material.dart';
 import 'package:audio_book_app/widgets/recommend/ListData_test.dart';
+
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 
 class ShoppingBag extends StatefulWidget {
@@ -10,6 +15,41 @@ class ShoppingBag extends StatefulWidget {
 class _ShoppingBagState extends State<ShoppingBag> {
   List <Books> booksList = [];
   bool chooseAll = true;
+  int allPay = 0;
+  int allCount = 0;
+  @override
+  void initState() {
+    void getGroupList(cookie) async {
+      var result = await HttpUtils.request(
+          '/get_book_grouplist',
+          method: HttpUtils.POST,
+          data: {
+            'r_id': cookie.value
+          }
+      );
+      var res = DataTransfer.fromJSON(result);
+      int allCost = 0;
+      int count = 0;
+      setState(() {
+        for (var i in res.data['list']) {
+          i['pay'] = true;
+          if (i['buy']) {
+            allCost += i['cost'];
+            count ++;
+          }
+          booksList.add(Books.fromJSON(i));
+        }
+        allCount = count;
+        allPay = allCost;
+      });
+    }
+    void getCookie() async {
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      getGroupList(cookies[0]);
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +80,7 @@ class _ShoppingBagState extends State<ShoppingBag> {
             SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Container(
-                width: 375,
+                width: MediaQuery.of(context).size.width,
                 height: 710,
                 color: Color(0xFFFFFFFF),
                 child: Column(
@@ -68,7 +108,7 @@ class _ShoppingBagState extends State<ShoppingBag> {
                               ),
                               Row(
                                 children: [
-                                  Image.asset(item.images, width: 86, height: 148)
+                                  Image.network(item.images, width: 86, height: 148)
                                 ],
                               ),
                               SizedBox(width: 22),
@@ -194,8 +234,8 @@ class _ShoppingBagState extends State<ShoppingBag> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text('原价￥458', style: TextStyle(decoration: TextDecoration.lineThrough, color: Color(0xFFA0A0A0), fontSize: 12),),
-                                          Text('￥358', style: TextStyle(color: Color(0xFFFF6E0A), fontSize: 20),)
+                                          Text('原价￥${allPay + 50 + allCount * 20}', style: TextStyle(decoration: TextDecoration.lineThrough, color: Color(0xFFA0A0A0), fontSize: 12),),
+                                          Text('￥$allPay', style: TextStyle(color: Color(0xFFFF6E0A), fontSize: 20),)
                                         ],
                                       ),
                                       Row(

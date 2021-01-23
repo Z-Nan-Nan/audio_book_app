@@ -1,4 +1,5 @@
 class Books {
+  final String groupId;
   final bool recommend;
   final String title;
   final String tag;
@@ -10,10 +11,11 @@ class Books {
   final int cost;
   bool buy;
   bool pay;
-  Books({this.recommend, this.title, this.tag, this.lists, this.images, this.manager, this.avatar, this.buy, this.pay, this.date, this.cost});
+  Books({this.groupId, this.recommend, this.title, this.tag, this.lists, this.images, this.manager, this.avatar, this.buy, this.pay, this.date, this.cost});
 
   factory Books.fromJSON(Map<String, dynamic> json) {
     return Books(
+        groupId: json['group_id'],
         recommend: json['recommend'],
         title: json['name'],
         tag: json['tag'],
