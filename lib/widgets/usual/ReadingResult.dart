@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:audio_book_app/widgets/commons/book.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class ReadingResult extends StatefulWidget {
   @override
@@ -22,15 +26,42 @@ class _ReadingResultState extends State<ReadingResult> {
   bool isEditAble = false;
   String commentWord = '太棒了，恭喜你完成人生中的第一本英文书！太棒了，恭喜你完成人生中的第一本英文书！';
   int starCount = 1;
+  var renderObject = {};
   final controller = TextEditingController();
+  // var data = [
+  //   // new ReadPercent('补读', 12, Color(0xFFFFD3AF)),
+  //   // new ReadPercent('正读', 42, Color(0xFF01B4AB))
+  // ];
+  List<ReadPercent> data = [];
+  @override
+  void initState() {
+    void getRenderInfo(info, book) async{
+      var result = await HttpUtils.request(
+        '/get_share_book_info?r_id=$info&book_id=$book',
+        method: HttpUtils.GET
+      );
+      var res = DataTransfer.fromJSON(result);
+      setState(() {
+        renderObject = res.data;
+        // print((renderObject['find_book']['finish_state']['fix_read'] is int));
+        data.add(new ReadPercent('补读', renderObject['find_book']['finish_state']['fix_read'], Color(0xFFFFD3AF)));
+        data.add(new ReadPercent('正读', renderObject['find_book']['finish_state']['is_read'], Color(0xFF01B4AB)));
+      });
+    }
+    void getCookie() async{
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      for (var item in cookies) {
+        if (item.name == 'share_book_id') {
+          getRenderInfo(cookies[0].value, item.value);
+        }
+      }
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 375, height: 731)..init(context);
-    var data = [
-      new ReadPercent('补读', 12, Color(0xFFFFD3AF)),
-      new ReadPercent('正读', 42, Color(0xFF01B4AB))
-    ];
-
     var series = [
       new charts.Series(
         domainFn: (ReadPercent clickData, _) => clickData.name,
@@ -83,7 +114,7 @@ class _ReadingResultState extends State<ReadingResult> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Book(height: 238, coverUrl: 'https://ali.baicizhan.com/readin/images/2020041623174187.png')
+                                Book(height: 238, coverUrl: '${renderObject['book_detail']['img_src']}')
                               ],
                             ),
                             Container(
@@ -96,21 +127,21 @@ class _ReadingResultState extends State<ReadingResult> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('了不起的盖茨比', style: TextStyle(color: Colors.white, fontSize: 25))
+                                        Text('${renderObject['book_detail']['name_cn']}', style: TextStyle(color: Colors.white, fontSize: 25))
                                       ],
                                     ),
                                     SizedBox(height: 9),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('68期经典 阿加莎系列 3/4', style: TextStyle(color: Colors.white))
+                                        Text('第${renderObject['book_detail']['term']}期', style: TextStyle(color: Colors.white))
                                       ],
                                     ),
                                     SizedBox(height: 9),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('共25章，261000字', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 11))
+                                        Text('共${renderObject['book_detail']['chapter_num'].length}章，${renderObject['book_detail']['words']}字', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 11))
                                       ],
                                     ),
                                     SizedBox(height: 18),
@@ -118,46 +149,106 @@ class _ReadingResultState extends State<ReadingResult> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         GestureDetector(
-                                          onTap: (){
+                                          onTap: ()async{
                                             setState(() {
                                               starCount = 1;
                                             });
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            bool flag = true;
+                                            for (var item in cookies) {
+                                              if (item.name == 'share_book_rate') {
+                                                item.value = '1';
+                                                flag = false;
+                                              }
+                                            }
+                                            if (flag) {
+                                              cookies.add(new Cookie('share_book_rate', '1'));
+                                            }
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
                                           },
                                           child: Image.asset('images/star_white.png', width: 18, height: 18),
                                         ),
                                         SizedBox(width: 7),
                                         GestureDetector(
-                                          onTap: (){
-                                            setState(() {
-                                              starCount = 2;
-                                            });
-                                          },
+                                            onTap: ()async{
+                                              setState(() {
+                                                starCount = 2;
+                                              });
+                                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                              bool flag = true;
+                                              for (var item in cookies) {
+                                                if (item.name == 'share_book_rate') {
+                                                  item.value = '2';
+                                                  flag = false;
+                                                }
+                                              }
+                                              if (flag) {
+                                                cookies.add(new Cookie('share_book_rate', '2'));
+                                              }
+                                              (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                            },
                                           child: starCount >= 2 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
                                         SizedBox(width: 7),
                                         GestureDetector(
-                                          onTap: (){
-                                            setState(() {
-                                              starCount = 3;
-                                            });
-                                          },
+                                            onTap: ()async{
+                                              setState(() {
+                                                starCount = 3;
+                                              });
+                                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                              bool flag = true;
+                                              for (var item in cookies) {
+                                                if (item.name == 'share_book_rate') {
+                                                  item.value = '3';
+                                                  flag = false;
+                                                }
+                                              }
+                                              if (flag) {
+                                                cookies.add(new Cookie('share_book_rate', '3'));
+                                              }
+                                              (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                            },
                                           child: starCount >= 3 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
                                         SizedBox(width: 7),
                                         GestureDetector(
-                                          onTap: (){
+                                          onTap: ()async{
                                             setState(() {
                                               starCount = 4;
                                             });
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            bool flag = true;
+                                            for (var item in cookies) {
+                                              if (item.name == 'share_book_rate') {
+                                                item.value = '4';
+                                                flag = false;
+                                              }
+                                            }
+                                            if (flag) {
+                                              cookies.add(new Cookie('share_book_rate', '4'));
+                                            }
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
                                           },
                                           child: starCount >= 4 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
                                         SizedBox(width: 7),
                                         GestureDetector(
-                                          onTap: (){
+                                          onTap: ()async{
                                             setState(() {
                                               starCount = 5;
                                             });
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            bool flag = true;
+                                            for (var item in cookies) {
+                                              if (item.name == 'share_book_rate') {
+                                                item.value = '5';
+                                                flag = false;
+                                              }
+                                            }
+                                            if (flag) {
+                                              cookies.add(new Cookie('share_book_rate', '5'));
+                                            }
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
                                           },
                                           child: starCount == 5 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
@@ -212,7 +303,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text('阅读时长', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                                          Text('3小时10分钟', style: TextStyle(color: Colors.white, fontSize: 16))
+                                          Text('${(renderObject['find_book']['reading_time'] / 3600).ceil()}小时${((renderObject['find_book']['reading_time'] / 60 - (renderObject['find_book']['reading_time'] / 3600).ceil()) / 60).ceil()}分钟', style: TextStyle(color: Colors.white, fontSize: 16))
                                         ],
                                       ),
                                     ),
@@ -237,7 +328,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                               SizedBox(width: 7),
                                               Text('正读', style: TextStyle(color: Colors.white)),
                                               SizedBox(width: 7),
-                                              Text('42', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                                              Text('${renderObject['find_book']['finish_state']['is_read']}', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
                                               Container(
                                                 height: 15,
                                                 child: VerticalDivider(
@@ -254,7 +345,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                               SizedBox(width: 7),
                                               Text('补读', style: TextStyle(color: Colors.white)),
                                               SizedBox(width: 7),
-                                              Text('12', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                                              Text('${renderObject['find_book']['finish_state']['fix_read']}', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
                                             ],
                                           ),
                                           chartWidget
@@ -273,7 +364,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             children: [
                                               Text('课后题正确率', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                                               SizedBox(height: 9),
-                                              Text('80%', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300))
+                                              Text('${((renderObject['find_book']['question_info']['right'] / (renderObject['find_book']['question_info']['right'] + renderObject['find_book']['question_info']['false'])) * 100).ceil()}%', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300))
                                             ],
                                           ),
                                           Container(
@@ -289,7 +380,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             children: [
                                               Text('连续正读天数', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                                               SizedBox(height: 9),
-                                              Text('6天', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300))
+                                              Text('${renderObject['find_book']['finish_state']['is_read_line']}天', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w300))
                                             ],
                                           )
                                         ],
@@ -315,30 +406,54 @@ class _ReadingResultState extends State<ReadingResult> {
               height: 46,
               padding: EdgeInsets.only(top: 13, left: 20, right: 18),
               child: GestureDetector(
-                onTap: (){
+                onTap: () async{
                   if(isEditAble) {
                     setState(() {
                       isEditAble = false;
                       commentWord = controller.text;
                     });
+                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                    var result = await HttpUtils.request(
+                        '/save_temp_data',
+                        method: HttpUtils.POST,
+                        data: {
+                          'r_id': cookies[0].value,
+                          'key': 'share_comment',
+                          'value': commentWord
+                        });
+                  } else {
+                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                    bool flag = true;
+                    for (var item in cookies) {
+                      if (item.name == 'share_book_rate') {
+                        item.value = '$starCount';
+                        flag = false;
+                      }
+                    }
+                    if (flag) {
+                      cookies.add(new Cookie('share_book_rate', '$starCount'));
+                    }
+                    (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                    var result = await HttpUtils.request(
+                        '/save_temp_data',
+                        method: HttpUtils.POST,
+                        data: {
+                          'r_id': cookies[0].value,
+                          'key': 'share_comment',
+                          'value': commentWord
+                        });
+                    Navigator.pushNamed(context, '/shareBook');
                   }
                 },
-                child: GestureDetector(
-                  onTap: (){
-                    if (!isEditAble) {
-                      Navigator.pushNamed(context, '/shareBook');
-                    }
-                  },
-                  child: Container(
-                    width: 339,
-                    height: 33,
-                    decoration: BoxDecoration(
-                        color: Color(0xFF01B4AB),
-                        borderRadius: BorderRadius.all(Radius.circular(28))
-                    ),
-                    child: Center(
-                      child: Text(isEditAble ? '提交' : '分享你的阅读成果', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                    ),
+                child: Container(
+                  width: 339,
+                  height: 33,
+                  decoration: BoxDecoration(
+                      color: Color(0xFF01B4AB),
+                      borderRadius: BorderRadius.all(Radius.circular(28))
+                  ),
+                  child: Center(
+                    child: Text(isEditAble ? '提交' : '分享你的阅读成果', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ),

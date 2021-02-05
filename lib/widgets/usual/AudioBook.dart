@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:audio_book_app/tools/AudioBookData.dart';
 import 'package:audio_book_app/widgets/commons/paragraph.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class AudioBook extends StatefulWidget {
   @override
@@ -10,74 +15,11 @@ class AudioBook extends StatefulWidget {
 }
 
 class _AudioBookState extends State<AudioBook> {
-  List<AudioBookData> audioBookData = [
-    AudioBookData.fromJSON({
-      'day': 'Day 01',
-      'raw_word': 'memorable / dump / sniffed / broadens / elbow / shallow / quaint / reassuring / perpetually / paisley',
-      'previous_story': '大学毕业前一晚，平凡聪慧的Emma与花花公子Dexter相遇。这次短暂的邂逅深深印入彼此心中最柔软的部分，并将两人紧紧地系在一起。二十年的知与爱，定格在每年7月15日这一天的相遇与错过。当两人站在追逐的尽头，面对的到底是美满的结局还是无法挽回的遗憾？',
-      'sentences': ['Part 1',
-      '1988–1992',
-      'Early Twenties',
-      '‘That was a memorable day to me, for it made great changes in me. But, it is the same with any life. Imagine one selected day struck out of it and think how different its course would have been.',
-      '‘Pause, you who read this, and think for a long moment of the long chain of iron or gold, of thorns or flowers, that would never have bound you, but for the formation of the first link on that memorable day.’',
-      'Charles Dickens, Great Expectations',
-      'Chapter 1',
-      'The Future',
-      'FRIDAY 15 JULY 1988',
-      'Rankeillor Street, Edinburgh',
-      '‘I suppose the important thing is to make some sort of difference,’ she said. ‘You know, actually change something.’',
-      '‘What, like “change the world”, you mean?’',
-      '‘Not the whole entire world. Just the little bit around you.’',
-      'They lay in silence for a moment, bodies curled around each other in the single bed, then both began to laugh in low, predawn voices. ‘Can’t believe I just said that,’ she groaned. ‘Sounds a bit corny, doesn’t it?’',
-      '‘A bit corny.’',
-      '‘I’m trying to be inspiring! I’m trying to lift your grubby soul for the great adventure that lies ahead of you.’ She turned to face him. ‘Not that you need it. I expect you’ve got your future nicely mapped out, ta very much. Probably got a little flow-chart somewhere or something.’',
-      '‘Hardly.’',
-      '‘So what’re you going to do then? What’s the great plan?’',
-      '‘Well, my parents are going to pick up my stuff, dump it at theirs, then I’ll spend a couple of days in their flat in London, see some friends. Then France—’',
-      '‘Very nice—’',
-      '‘Then China maybe, see what that’s all about, then maybe onto India, travel around there for a bit—’',
-      '‘Travelling,’ she sighed. ‘So predictable.’',
-      '‘What’s wrong with travelling?’',
-      '‘Avoiding reality more like.’',
-      '‘I think reality is over-rated,’ he said in the hope that this might come across as dark and charismatic.',
-      'She sniffed. ‘S’alright, I suppose, for those who can afford it. Why not just say “I’m going on holiday for two years”? It’s the same thing.’',
-      '‘Because travel broadens the mind,’ he said, rising onto one elbow and kissing her.',
-      '‘Oh I think you’re probably a bit too broad-minded as it is,’ she said, turning her face away, for the moment at least. They settled again on the pillow.',
-      '‘Anyway, I didn’t mean what are you doing next month, I meant the future-future, when you’re, I don’t know . . .’',
-      '‘Forty?’ He too seemed to be struggling with the concept. ‘Don’t know. Am I allowed to say “rich”?’',
-      '‘Just so, so shallow.’',
-      '‘Alright then, “famous”.’ He began to nuzzle at her neck. ‘Bit morbid, this, isn’t it?’',
-      '‘It’s not morbid, it’s . . . exciting.’',
-      '‘“Exciting!”’ He was imitating her voice now, her soft Yorkshire accent, trying to make her sound daft.',
-      'She got this a lot, posh boys doing funny voices, as if there was something unusual and quaint about an accent, and not for the first time she felt a reassuring shiver of dislike for him.',
-      'She shrugged herself away until her back was pressed against the cool of the wall.',
-      '‘Yes, exciting. We’re meant to be excited, aren’t we? All those possibilities. It’s like the Vice-Chancellor said, “the doors of opportunity flung wide . . .”’',
-      '‘“Yours are the names in tomorrow’s newspapers . . .”’',
-      '‘Not very likely.’',
-      '‘So, what, are you excited then?’',
-      '‘Me? God no, I’m crapping myself.’',
-      '‘Me too. Christ . . .’ He turned suddenly and reached for the cigarettes on the floor by the side of the bed, as if to steady his nerves. ‘Forty years old. Forty. Fucking hell.’',
-      'Smiling at his anxiety, she decided to make it worse. ‘So what’ll you be doing when you’re forty?’',
-      'He lit his cigarette thoughtfully. ‘Well the thing is, Em—’',
-      '‘“Em”? Who’s “Em”?’',
-      '‘People call you Em. I’ve heard them.’',
-      '‘Yeah, friends call me Em.’',
-      '‘So can I call you Em?’',
-      '‘Go on then, Dex.’',
-      '‘So I’ve given this whole “growing old” thing some thought and I’ve come to the decision that I’d like to stay exactly as I am right now.’',
-      'Dexter Mayhew. She peered up at him through her fringe as he leant against the cheap buttoned vinyl headboard and even without her spectacles on it was clear why he might want to stay exactly this way.',
-      'Eyes closed, the cigarette glued languidly to his lower lip, the dawn light warming the side of his face through the red filter of the curtains, he had the knack of looking perpetually posed for a photograph.',
-      'Emma Morley thought ‘handsome’ a silly, nineteenth-century word, but there really was no other word for it, except perhaps ‘beautiful’.',
-      'He had one of those faces where you were aware of the bones beneath the skin, as if even his bare skull would be attractive.',
-      'A fine nose, slightly shiny with grease, and dark skin beneath the eyes that looked almost bruised, a badge of honour from all the smoking and late nights spent deliberately losing at strip poker with girls from Bedales.',
-      'There was something feline about him: eyebrows fine, mouth pouty in a self-conscious way, lips a shade too dark and full, but dry and chapped now, and rouged with Bulgarian red wine.',
-      'Gratifyingly his hair was terrible, short at the back and sides, but with an awful little quiff at the front. Whatever gel he used had worn off, and now the quiff looked pert and fluffy, like a silly little hat.',
-      'Still with his eyes closed, he exhaled smoke through his nose. Clearly he knew he was being looked at because he tucked one hand beneath his armpit, bunching up his pectorals and biceps.',
-      'Where did the muscles come from? Certainly not sporting activity, unless you counted skinny-dipping and playing pool. Probably it was just the kind of good health that was passed down in the family, along with the stocks and shares and the good furniture.',
-      'Handsome then, or beautiful even, with his paisley boxer shorts pulled down to his hip bones and somehow here in her single bed in her tiny rented room at the end of four years of college.',
-      '‘Handsome’! Who do you think you are, Jane Eyre? Grow up. Be sensible. Don’t get carried away.']
-    })
-  ];
+  AudioPlayer audioPlayer = AudioPlayer();
+  String audioUrl = '';
+  List<AudioBookData> audioBookData = [];
+  var renderObject = {};
+  List chapterList = [];
   bool clickAble = true;
   int selectId = null;
   bool editModal = false;
@@ -91,7 +33,25 @@ class _AudioBookState extends State<AudioBook> {
   double process = 0;
   Timer _timer;
   double opacityLevel = 0.0;
+  int jumpTime = 0;
+  String newNote = '';
+  String isNote = '';
+  bool hasNote = false;
+  var selectArticle = 'a_0001';
+  var fontSizeSet = {
+    'theme': 'medium',
+    'title': 34.0,
+    'vocabulary': 16.0,
+    'explain': 13.0,
+    'rawWord': 16.0,
+    'story': 13.0,
+    'question': 16.0,
+    'articleNum': 15.0,
+    'note': 16.0,
+    'article': 18.0
+  };
   String theme = 'brown';
+  TextEditingController textController = new TextEditingController();
   changeOpacity() {
     setState(
       () => opacityLevel = opacityLevel == 0 ? 1.0 : 0.0
@@ -101,6 +61,31 @@ class _AudioBookState extends State<AudioBook> {
     setState(() {
       clickAble = false;
       selectId = i;
+      var flag = false;
+      for (var j in renderObject['note_collection']) {
+        if (j['pos'] == selectId - 3) {
+          setState(() {
+            flag = true;
+            isNote = j['content'];
+            hasNote = true;
+          });
+        }
+      }
+      if (!flag) {
+        setState(() {
+          isNote = '';
+          hasNote = false;
+        });
+      }
+      if (selectId == 3) {
+        setState(() {
+          jumpTime = 0;
+        });
+      } else {
+        setState(() {
+          jumpTime = (double.parse(renderObject['audio'][0]['audio_times'][selectId - 4]['end_time']) * 1000).floor();
+        });
+      }
     });
   }
   setModal(height) {
@@ -117,6 +102,151 @@ class _AudioBookState extends State<AudioBook> {
         line += '${list[i]} / ';
       }
     }
+  }
+  play() async {
+    int result = await audioPlayer.play(audioUrl);
+    if (result == 1) {
+      setState(() {
+        process = (isMin * 60 + isSecond) / (allMin * 60 + allSecond) * 223;
+        const timeout = const Duration(seconds: 1);
+        _timer = Timer.periodic(timeout, (timer) {
+          if (process >= 223) {
+            process = 223;
+          } else {
+            if (isSecond == 60) {
+              isSecond = 0;
+              setState(() {
+                isMin++;
+              });
+            }
+            process = (isMin * 60 + isSecond) / (allMin * 60 + allSecond) * 223;
+            if (isMin * 60 + isSecond <= allMin * 60 + allSecond - 1) {
+              print('${isSecond}');
+              setState(() {
+                isSecond++;
+              });
+            }
+          }
+        });
+      });
+      print('play success');
+    } else {
+      print('play failed');
+    }
+  }
+  pause() async {
+    int result = await audioPlayer.pause();
+    if (result == 1) {
+      // success
+      setState(() {
+        if (_timer != null) {
+          _timer.cancel();
+          _timer = null;
+        }
+      });
+      print('pause success');
+    } else {
+      print('pause failed');
+    }
+  }
+  jump(select) async {
+    int result = await audioPlayer.resume();
+    print((isMin * 60 + isSecond * 1000) is int);
+    if (result == 1) {
+      audioPlayer.onAudioPositionChanged.listen((p) async {
+        setState(() {
+          isMin = p.inMinutes;
+          if (select) {
+            if (p.inSeconds > 59) {
+              isSecond = (p.inSeconds / 60).floor();
+            } else {
+              isSecond = p.inSeconds;
+            }
+          } else {
+            if ((p.inSeconds / 60).floor() > isSecond) {
+              if (p.inSeconds > 59) {
+                isSecond = (p.inSeconds / 60).floor();
+              } else {
+                isSecond = p.inSeconds;
+              }
+            }
+          }
+        });
+      });
+      print('go to success');
+      setState(() {
+        process = (isMin * 60 + isSecond) / (allMin * 60 + allSecond) * 223;
+        const timeout = const Duration(seconds: 1);
+        _timer = Timer.periodic(timeout, (timer) {
+          if (process >= 223) {
+            process = 223;
+          } else {
+            if (isSecond == 60) {
+              isSecond = 0;
+              setState(() {
+                isMin++;
+              });
+            }
+            process = (isMin * 60 + isSecond) / (allMin * 60 + allSecond) * 223;
+            if (isMin * 60 + isSecond <= allMin * 60 + allSecond - 1) {
+              print('${isSecond}');
+              setState(() {
+                isSecond++;
+              });
+            }
+          }
+        });
+      });
+      // await audioPlayer.resume();
+    } else {
+      print('go to failed');
+    }
+  }
+  jumpDirection(select) async{
+    int result = await audioPlayer.seek(new Duration(milliseconds: jumpTime));
+    if (result == 1) {
+      jump(select);
+      print('go to success');
+      // await audioPlayer.resume();
+    } else {
+      print('go to failed');
+    }
+  }
+  @override
+  void initState() {
+    void getRenderInfo() async{
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      var bookId = '';
+      for (var i in cookies) {
+        if (i.name == 'select_book') {
+          bookId = i.value;
+        }
+      }
+      var res = await HttpUtils.request(
+        '/get_audio_book_info?b_id=$bookId&a_id=a_0001&r_id=${cookies[0].value}',
+        method: HttpUtils.GET
+      );
+      var result = DataTransfer.fromJSON(res);
+      setState(() {
+        allMin = (result.data['audio'][0]['duration'] / 1000 / 60).floor();
+        allSecond = (result.data['audio'][0]['duration'] / 1000 - allMin * 60).floor();
+        audioUrl = (result.data['audio'][0]['audio_url']);
+        audioBookData.add(AudioBookData.fromJSON(result.data));
+        renderObject = result.data;
+        chapterList = result.data['chapter_collection'];
+      });
+    }
+    void test() async{
+      var res = await HttpUtils.request(
+          '/get_audio_book_data',
+          method: HttpUtils.GET
+      );
+      var result = DataTransfer.fromJSON(res);
+      print(result);
+    }
+    // test();
+    getRenderInfo();
+    super.initState();
   }
   @override
   Widget build(BuildContext context) {
@@ -156,12 +286,12 @@ class _AudioBookState extends State<AudioBook> {
                                 Text('${isMin < 10 ? '0${isMin}' : isMin}:${isSecond < 10 ? '0${isSecond}' : isSecond}', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37))),
                                 SizedBox(width: 10),
                                 Container(
-                                  width: 236,
+                                  width: 223,
                                   height: 1,
                                   child: Stack(
                                     children: [
                                       Container(
-                                        width: 236,
+                                        width: 223,
                                         height: 1,
                                         decoration: BoxDecoration(color: Color(0xFFF0F0F0)),
                                       ),
@@ -190,7 +320,7 @@ class _AudioBookState extends State<AudioBook> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('${audioBookData[0].day}', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: 34, fontWeight: FontWeight.w600, fontFamily: 'NewYork')),
+                                        Text('Day ${audioBookData[0].day < 10 ? 0 : ''}${audioBookData[0].day}', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: fontSizeSet['title'], fontWeight: FontWeight.w600, fontFamily: 'NewYork')),
                                         SizedBox(height: 27)
                                       ],
                                     ),
@@ -203,7 +333,6 @@ class _AudioBookState extends State<AudioBook> {
                                       children: [
                                         Container(
                                           width: 321,
-                                          height: 154,
                                           padding: EdgeInsets.all(18),
                                           decoration: BoxDecoration(color: theme == 'brown' ? Color(0xFFFEECC8) : Color(0xFFE4F9EE), borderRadius: BorderRadius.all(Radius.circular(4))),
                                           child: Column(
@@ -214,12 +343,12 @@ class _AudioBookState extends State<AudioBook> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  Text('今日词表', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: 16, fontWeight: FontWeight.w600)),
-                                                  Text('查看释义', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: 13, fontWeight: FontWeight.w500))
+                                                  Text('今日词表', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: fontSizeSet['vocabulary'], fontWeight: FontWeight.w600)),
+                                                  Text('查看释义', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: fontSizeSet['explain'], fontWeight: FontWeight.w500))
                                                 ],
                                               ),
                                               SizedBox(height: 18),
-                                              Text('${audioBookData[0].rawWord}', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: 16, height: 1.5))
+                                              Text('${audioBookData[0].rawWord}', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontSize: fontSizeSet['rawWord'], height: 1.5))
                                             ],
                                           ),
                                         ),
@@ -246,7 +375,7 @@ class _AudioBookState extends State<AudioBook> {
                                               SizedBox(width: 15),
                                               Container(
                                                 width: 290,
-                                                child: Text('${audioBookData[0].previousStory}', style: TextStyle(color: Color(0xFF787878), fontSize: 13, height: 2)),
+                                                child: Text('${audioBookData[0].previousStory}', style: TextStyle(color: Color(0xFF787878), fontSize: fontSizeSet['story'], height: 2)),
                                               )
                                             ],
                                           ),
@@ -263,7 +392,19 @@ class _AudioBookState extends State<AudioBook> {
                                       children: [
                                         SizedBox(height: 12),
                                         GestureDetector(
-                                          onTap: (){
+                                          onTap: ()async{
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            bool flag = true;
+                                            for (var i in cookies) {
+                                              if (i.name == 'articleId') {
+                                                i.value = selectArticle;
+                                                flag = false;
+                                              }
+                                            }
+                                            if (flag) {
+                                              cookies.add(new Cookie('articleId', selectArticle));
+                                            }
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
                                             Navigator.pushNamed(context, '/question');
                                           },
                                           child: Container(
@@ -271,7 +412,7 @@ class _AudioBookState extends State<AudioBook> {
                                             height: 43,
                                             decoration: BoxDecoration(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF01B4AB), borderRadius: BorderRadius.all(Radius.circular(28))),
                                             child: Center(
-                                              child: Text('读完了，去做题', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                                              child: Text('读完了，去做题', style: TextStyle(color: Colors.white, fontSize: fontSizeSet['question'], fontWeight: FontWeight.w600)),
                                             ),
                                           ),
                                         ),
@@ -280,10 +421,10 @@ class _AudioBookState extends State<AudioBook> {
                                     ),
                                   );
                                 } else if (selectId == index) {
-                                  return paragraph(sentence: '${audioBookData[0].sentences[index - 3]}', color: Color(0xFF3C3C3C), selectColor: theme == 'brown' ? Color(0xFFEAD2A4) : Color(0xFF00B4AA), clickAble: false, func: (key) => setClickAble(key), index: index, refresh: clickAble ? true : false);
+                                  return paragraph(sentence: '${audioBookData[0].sentences[index - 3]}', color: Color(0xFF3C3C3C), selectColor: theme == 'brown' ? Color(0xFFEAD2A4) : Color(0xFF00B4AA), clickAble: false, func: (key) => setClickAble(key), index: index, refresh: clickAble ? true : false, fontSizeSet: fontSizeSet['article']);
                                 } else {
                                   // keys.add(GlobalKey(debugLabel:index.toString()));
-                                  return paragraph(sentence: '${audioBookData[0].sentences[index - 3]}', color: Color(0xFF3C3C3C), selectColor: theme == 'brown' ? Color(0xFFEAD2A4) : Color(0xFF00B4AA), clickAble: true, func: (key) => setClickAble(key), showModal: (height) => setModal(height), index: index, refresh: false);
+                                  return paragraph(sentence: '${audioBookData[0].sentences[index - 3]}', color: Color(0xFF3C3C3C), selectColor: theme == 'brown' ? Color(0xFFEAD2A4) : Color(0xFF00B4AA), clickAble: true, func: (key) => setClickAble(key), showModal: (height) => setModal(height), index: index, refresh: false, fontSizeSet: fontSizeSet['article']);
                                 }
                               },
                             ),
@@ -307,45 +448,38 @@ class _AudioBookState extends State<AudioBook> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 43,
-                              height: 43,
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
-                              child: Center(
-                                child: Image.asset('images/icon_backone.png', width: 27, height: 27),
+                            GestureDetector(
+                              onTap: ()async {
+                                pause();
+                                setState(() {
+                                  isMin = 0;
+                                  isSecond = 0;
+                                  jumpTime = 0;
+                                  isPlay = true;
+                                });
+                                jumpDirection(false);
+                              },
+                              child: Container(
+                                width: 43,
+                                height: 43,
+                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
+                                child: Center(
+                                  child: Image.asset('images/icon_backone.png', width: 27, height: 27),
+                                ),
                               ),
                             ),
                             GestureDetector(
                               onTap: (){
                                 setState(() {
                                   isPlay = !isPlay;
-                                  if (isPlay && process <=236) {
-                                    process = (isMin * 60 + isSecond) / (allMin * 60 + allSecond) * 236;
-                                    const timeout = const Duration(seconds: 1);
-                                    _timer = Timer.periodic(timeout, (timer) {
-                                      setState(() {
-                                        if (process >= 236) {
-                                          process = 236;
-                                        } else {
-                                          if (isSecond == 60) {
-                                            isSecond = 0;
-                                            isMin++;
-                                          }
-                                          process = (isMin * 60 + isSecond) / (allMin * 60 + allSecond) * 236;
-                                          if (isMin * 60 + isSecond <= allMin * 60 + allSecond - 1) {
-                                            print('${isSecond}');
-                                            isSecond++;
-                                          }
-                                        }
-                                      });
-                                    });
+                                  if (isPlay && process <=223) {
+                                    if (isMin > 0 || isSecond > 0) {
+                                      jump(false);
+                                    } else {
+                                      play();
+                                    }
                                   } else {
-                                    setState(() {
-                                      if (_timer != null) {
-                                        _timer.cancel();
-                                        _timer = null;
-                                      }
-                                    });
+                                    pause();
                                   }
                                 });
                               },
@@ -393,23 +527,113 @@ class _AudioBookState extends State<AudioBook> {
                           duration: new Duration(seconds: 1),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Container(
-                                width: 43,
-                                height: 43,
-                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
-                                child: Center(
-                                  child: Image.asset('images/icon_font.png', width: 27, height: 27),
+                              GestureDetector(
+                                onTap: (){
+                                  if (fontSizeSet['theme'] == 'medium') {
+                                    setState(() {
+                                      fontSizeSet = {
+                                        'theme': 'large',
+                                        'title': 36.0,
+                                        'vocabulary': 18.0,
+                                        'explain': 14.5,
+                                        'rawWord': 18.0,
+                                        'story': 14.5,
+                                        'question': 18.0,
+                                        'articleNum': 16.5,
+                                        'note': 18.0,
+                                        'article': 20.0
+                                      };
+                                    });
+                                  } else if (fontSizeSet['theme'] == 'large') {
+                                    setState(() {
+                                      fontSizeSet = {
+                                        'theme': 'small',
+                                        'title': 32.0,
+                                        'vocabulary': 14.0,
+                                        'explain': 11.5,
+                                        'rawWord': 14.0,
+                                        'story': 11.5,
+                                        'question': 14.0,
+                                        'articleNum': 13.5,
+                                        'note': 14.0,
+                                        'article': 16.0
+                                      };
+                                    });
+                                  } else {
+                                    setState(() {
+                                      fontSizeSet = {
+                                        'theme': 'medium',
+                                        'title': 34.0,
+                                        'vocabulary': 16.0,
+                                        'explain': 13.0,
+                                        'rawWord': 16.0,
+                                        'story': 13.0,
+                                        'question': 16.0,
+                                        'articleNum': 15.0,
+                                        'note': 16.0,
+                                        'article': 18.0
+                                      };
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  width: 43,
+                                  height: 43,
+                                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
+                                  child: Center(
+                                    child: Image.asset('images/icon_font.png', width: 27, height: 27),
+                                  ),
                                 ),
                               ),
                               Container(
-                                width: 43,
-                                height: 43,
-                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
-                                child: Center(
-                                  child: Text('1.0x', style: TextStyle(color: Colors.black, fontSize: 15, fontFamily: 'NewYork')),
-                                ),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: chapterList.map((item){
+                                      return (
+                                          GestureDetector(
+                                            onTap: ()async{
+                                              int re = await audioPlayer.release();
+                                              if (re == 1) {
+                                                setState(() {
+                                                  isMin = 0;
+                                                  isSecond = 0;
+                                                  selectArticle = 'a_00${int.parse(item) > 10 ? '' : '0'}$item';
+                                                });
+                                                var res = await HttpUtils.request(
+                                                    '/get_audio_book_info?b_id=b_0001&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item',
+                                                    method: HttpUtils.GET
+                                                );
+                                                var result = DataTransfer.fromJSON(res);
+                                                setState(() {
+                                                  allMin = (result.data['audio'][0]['duration'] / 1000 / 60).floor();
+                                                  allSecond = (result.data['audio'][0]['duration'] / 1000 - allMin * 60).floor();
+                                                  audioUrl = (result.data['audio'][0]['audio_url']);
+                                                  audioBookData = [];
+                                                  audioBookData.add(AudioBookData.fromJSON(result.data));
+                                                  renderObject = result.data;
+                                                  chapterList = result.data['chapter_collection'];
+                                                });
+                                                print('release success');
+                                              } else {
+                                                print('release failed');
+                                              }
+                                            },
+                                            child: Container(
+                                              width: 43,
+                                              height: 43,
+                                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
+                                              child: Center(
+                                                child: Text('day $item', style: TextStyle(color: Colors.black, fontSize: fontSizeSet['articleNum'], fontFamily: 'NewYork')),
+                                              ),
+                                            ),
+                                          )
+                                      );
+                                    }).toList()
+                                  ),
+                                )
                               ),
                               GestureDetector(
                                 onTap: (){
@@ -440,6 +664,19 @@ class _AudioBookState extends State<AudioBook> {
                 GestureDetector(
                   onTap: (){
                     setState(() {
+                      textController = TextEditingController.fromValue(
+                        ///用来设置初始化时显示
+                        TextEditingValue(
+                          ///用来设置文本 controller.text = "0000"
+                            text: '',
+                            ///设置光标的位置
+                            selection: TextSelection.fromPosition(
+                              ///用来设置文本的位置
+                                TextPosition(
+                                    affinity: TextAffinity.downstream,
+                                    /// 光标向后移动的长度
+                                    offset: 0))),
+                      );
                       clickAble = true;
                       editModal = false;
                     });
@@ -461,7 +698,7 @@ class _AudioBookState extends State<AudioBook> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Offstage(
-                                offstage: false,
+                                offstage: !hasNote,
                                 child: Container(
                                   width: 321,
                                   padding: EdgeInsets.symmetric(vertical: 13, horizontal: 18),
@@ -473,7 +710,7 @@ class _AudioBookState extends State<AudioBook> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('笔记', style: TextStyle(color: Color(0xFF282828), fontSize: 16, fontWeight: FontWeight.w600)),
+                                          Text('笔记', style: TextStyle(color: Color(0xFF282828), fontSize: fontSizeSet['note'], fontWeight: FontWeight.w600)),
                                           GestureDetector(
                                             onTap: (){
                                               setState(() {
@@ -487,7 +724,7 @@ class _AudioBookState extends State<AudioBook> {
                                       SizedBox(height: 7),
                                       Divider(),
                                       SizedBox(height: 17),
-                                      Text('《东方快车谋杀案》（Murder on the Orient Express）是英国作家阿加莎·克里斯蒂创作的侦探小说', style: TextStyle(color: Color(0xFF3C3C3C)))
+                                      Text('$isNote', style: TextStyle(color: Color(0xFF3C3C3C)))
                                     ],
                                   ),
                                 ),
@@ -507,15 +744,24 @@ class _AudioBookState extends State<AudioBook> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Image.asset('images/icon_playArticle.png', width: 25, height: 25),
-                                            SizedBox(height: 3),
-                                            Text('播放', style: TextStyle(color: Colors.white))
-                                          ],
+                                      GestureDetector(
+                                        onTap: ()async{
+                                          setState(() {
+                                            isPlay = true;
+                                          });
+                                          pause();
+                                          jumpDirection(true);
+                                        },
+                                        child: Container(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Image.asset('images/icon_playArticle.png', width: 25, height: 25),
+                                              SizedBox(height: 3),
+                                              Text('播放', style: TextStyle(color: Colors.white))
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       SizedBox(width: 36),
@@ -534,7 +780,7 @@ class _AudioBookState extends State<AudioBook> {
                                       GestureDetector(
                                         onTap: (){
                                           setState(() {
-                                            createModal = true;
+                                            createModal = !createModal;
                                           });
                                         },
                                         child: Container(
@@ -587,6 +833,27 @@ class _AudioBookState extends State<AudioBook> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            createModal = true;
+                                            editModal = false;
+                                            newNote = isNote;
+                                            print(newNote);
+                                          });
+                                          textController = TextEditingController.fromValue(
+                                            ///用来设置初始化时显示
+                                            TextEditingValue(
+                                              ///用来设置文本 controller.text = "0000"
+                                              text: isNote,
+                                              ///设置光标的位置
+                                              selection: TextSelection.fromPosition(
+                                                ///用来设置文本的位置
+                                                TextPosition(
+                                                    affinity: TextAffinity.downstream,
+                                                    /// 光标向后移动的长度
+                                                    offset: isNote.length))),
+                                          );
+                                        },
                                         child: Container(
                                           width: MediaQuery.of(context).size.width,
                                           padding: EdgeInsets.all(17),
@@ -645,6 +912,12 @@ class _AudioBookState extends State<AudioBook> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     TextField(
+                                      controller: textController,
+                                      onChanged: (val){
+                                        setState(() {
+                                          newNote = val;
+                                        });
+                                      },
                                       maxLines: 4,
                                       showCursor: true,
                                       cursorWidth: 3,
@@ -662,6 +935,33 @@ class _AudioBookState extends State<AudioBook> {
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         GestureDetector(
+                                          onTap: ()async {
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            var bookId = '';
+                                            for (var i in cookies) {
+                                              print(i.name);
+                                              if (i.name == 'select_book') {
+                                                bookId = i.value;
+                                              }
+                                            }
+                                            var res = await HttpUtils.request(
+                                              '/send_article_note',
+                                              method: HttpUtils.POST,
+                                              data: {
+                                                'r_id': cookies[0].value,
+                                                'a_id': selectArticle,
+                                                'b_id': bookId,
+                                                'pos': selectId - 3,
+                                                'content': newNote
+                                              }
+                                            );
+                                            var result = DataTransfer.fromJSON(res);
+                                            if (result.status == 1) {
+                                              setState(() {
+                                                createModal = false;
+                                              });
+                                            }
+                                          },
                                           child: Text('保存', style: TextStyle(color: theme == 'brown' ? Color(0xFF524832) : Color(0xFF2E4B37), fontWeight: FontWeight.w600)),
                                         )
                                       ],

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class paragraph extends StatefulWidget {
-  paragraph({Key key, this.sentence, this.color, this.selectColor, this.clickAble, this.func, this.showModal, this.index, this.refresh}):super(key: key);
+  paragraph({Key key, this.sentence, this.color, this.selectColor, this.clickAble, this.func, this.showModal, this.index, this.refresh, this.fontSizeSet}):super(key: key);
   final String sentence;
   final Color color;
   final Color selectColor;
   final int index;
   final func;
   final showModal;
+  double fontSizeSet;
   bool refresh;
   bool clickAble;
   @override
@@ -33,7 +34,7 @@ class _paragraphState extends State<paragraph> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12),
-        child: Text('${widget.sentence}', style: TextStyle(color: widget.refresh ? widget.color : isSelect ? widget.selectColor : widget.color, fontSize: 18, fontFamily: 'Charter', height: 2)),
+        child: Text('${widget.sentence}', style: TextStyle(color: widget.refresh ? widget.color : isSelect ? widget.selectColor : widget.color, fontSize: widget.fontSizeSet, fontFamily: 'Charter', height: 2)),
       ),
     );
   }

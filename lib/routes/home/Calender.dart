@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:audio_book_app/widgets/commons/book.dart';
 import 'package:audio_book_app/tools/DayStatus.dart';
 import 'package:audio_book_app/widgets/commons/month.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class Calender extends StatefulWidget {
   @override
@@ -10,307 +14,48 @@ class Calender extends StatefulWidget {
 
 class _CalenderState extends State<Calender> {
   ScrollController controller = new ScrollController();
-  List courseList = ['41期进阶 商业创新系列', '65期高阶 理想与现实', '65期进阶 迪士尼', '68期入门 环球梦工厂系列', '69期进阶 女性成长系列', '69期进阶 牧羊少年的奇幻之旅', '72期高阶 理想与现实'];
-  List <DayStatus> daysList = [
-    DayStatus.fromJSON({
-      'year': 2020,
-      'month': 11,
-      'startDay': 7,
-      'days': [
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 0
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        },
-        {
-          'read': 2
-        }]
-    }),
-    DayStatus.fromJSON({
-      'year': 2020,
-      'month': 12,
-      'startDay': 2,
-      'days': [
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },
-        {
-          'read': 1
-        },{
-          'read': 1
-        }]
-    }),
-    DayStatus.fromJSON({
-      'year': 2021,
-      'month': 1,
-      'startDay': 5,
-      'days': [
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        },
-        {
-          'read': 3
-        }]
-    })
-  ];
+  List <DayStatus> daysList = [];
   bool modalVisible = false;
+  var renderObject = {};
+  int readTypeOne = 0;
+  int readTypeTwo = 0;
+  int readTypeThree = 0;
+  @override
+  void initState() {
+    void getRenderInfo(id) async{
+      var result = await HttpUtils.request(
+        '/get_calender_info?r_id=$id',
+        method: HttpUtils.GET
+      );
+      var res = DataTransfer.fromJSON(result);
+      setState(() {
+        renderObject = res.data;
+        for (var i in res.data['days_list']) {
+          for (var j in i['days']) {
+            if (j['read'] == 1) {
+              readTypeOne++;
+            }
+            if (j['read'] == 2) {
+              readTypeTwo++;
+            }
+            if (j['read'] == 3) {
+              readTypeThree++;
+            }
+          }
+          daysList.add(DayStatus.fromJSON(i));
+        }
+      });
+    }
+    void getCookie() async {
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      getRenderInfo(cookies[0].value);
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     var nowTime = DateTime.now();
-    print(nowTime.day);
     return Scaffold(
       body: Stack(
         children: [
@@ -343,7 +88,7 @@ class _CalenderState extends State<Calender> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text('Day 01', style: TextStyle(color: Color(0xFF282828), fontSize: 22, fontWeight: FontWeight.w600, fontFamily: 'NewYork')),
+                        Text('Day ${renderObject['day_num'] < 10 ? '0' : ''}${renderObject['day_num']}', style: TextStyle(color: Color(0xFF282828), fontSize: 22, fontWeight: FontWeight.w600, fontFamily: 'NewYork')),
                         Container(
                           width: 208,
                           child: Row(
@@ -356,7 +101,7 @@ class _CalenderState extends State<Calender> {
                                 decoration: BoxDecoration(color: Color(0xFF01B4AB), borderRadius: BorderRadius.all(Radius.circular(4))),
                               ),
                               SizedBox(width: 4),
-                              Text('正读 38', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 13)),
+                              Text('正读 $readTypeOne', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 13)),
                               SizedBox(width: 14),
                               Container(
                                 width: 7,
@@ -364,7 +109,7 @@ class _CalenderState extends State<Calender> {
                                 decoration: BoxDecoration(color: Color(0xFFFFD3AF), borderRadius: BorderRadius.all(Radius.circular(4))),
                               ),
                               SizedBox(width: 4),
-                              Text('补读 4', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 13)),
+                              Text('补读 $readTypeTwo', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 13)),
                               SizedBox(width: 14),
                               Container(
                                 width: 7,
@@ -372,7 +117,7 @@ class _CalenderState extends State<Calender> {
                                 decoration: BoxDecoration(color: Color(0xFFF0F0F0), borderRadius: BorderRadius.all(Radius.circular(4))),
                               ),
                               SizedBox(width: 4),
-                              Text('未完成 6', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 13)),
+                              Text('未完成 $readTypeThree', style: TextStyle(color: Color(0xFFA0A0A0), fontSize: 13)),
                             ],
                           ),
                         )
@@ -438,16 +183,8 @@ class _CalenderState extends State<Calender> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text('68期入门 纳尼亚传奇：狮子、女巫和魔衣橱', style: TextStyle(color: Color(0xFF01B4AB), fontWeight: FontWeight.w600)),
+                            Text('${renderObject['book_group']['name']}', style: TextStyle(color: Color(0xFF01B4AB), fontWeight: FontWeight.w600)),
                             SizedBox(width: 10),
-                            GestureDetector(
-                              onTap: (){
-                                setState(() {
-                                  modalVisible = true;
-                                });
-                              },
-                              child: modalVisible ? Image.asset('images/icon_toUp.png', width: 13, height: 13) : Image.asset('images/icon_arrow_right2.png', width: 13, height: 13),
-                            ),
                           ],
                         ),
                       ),
@@ -461,13 +198,13 @@ class _CalenderState extends State<Calender> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Book(height: 115, coverUrl: 'https://ali.baicizhan.com/readin/images/2020051117451690.jpg'),
+                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][0]['img_src']}'),
                               SizedBox(width: 14),
-                              Book(height: 115, coverUrl: 'https://ali.baicizhan.com/readin/images/2020060517233085.jpeg'),
+                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][1]['img_src']}'),
                               SizedBox(width: 14),
-                              Book(height: 115, coverUrl: 'https://ali.baicizhan.com/readin/images/2020081311083151.jpeg'),
+                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][2]['img_src']}'),
                               SizedBox(width: 14),
-                              Book(height: 115, coverUrl: 'https://ali.baicizhan.com/readin/images/202004281128356.jpeg'),
+                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][3]['img_src']}'),
                               SizedBox(width: 14),
                             ],
                           ),
@@ -479,54 +216,6 @@ class _CalenderState extends State<Calender> {
               ),
             ),
           ),
-          Offstage(
-            offstage: !modalVisible,
-            child: Stack(
-              children: [
-                GestureDetector(
-                  onTap: (){
-                    setState(() {
-                      modalVisible = false;
-                    });
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    decoration: BoxDecoration(color: Color(0x99000000)),
-                  ),
-                ),
-                Positioned(
-                  bottom: 300,
-                  right: 50,
-                  child: Container(
-                    width: 270,
-                    height: courseList.length <= 3 ? double.parse('${58 * courseList.length}') : 174,
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(15))),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: courseList.map((item){
-                          return Container(
-                            height: 58,
-                            padding: EdgeInsets.all(6),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('${item}', style: TextStyle(color: Color(0xFF282828), fontSize: 16)),
-                                Divider()
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  )
-                )
-              ],
-            ),
-          )
         ],
       )
     );

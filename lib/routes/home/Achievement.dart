@@ -154,7 +154,7 @@ class _AchievementState extends State<Achievement> {
                               SizedBox(height: 36),
                               Text('书架', style: TextStyle(color: Color(0xff282828), fontSize: 18)),
                               SizedBox(height: 4),
-                              Text('正在阅读 3 本，共 5 本', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
+                              Text('正在阅读 ${renderObject['info_detail']['is_read_book'].length} 本，共 ${renderObject['info_detail']['all_books'].length} 本', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
                             ],
                           )
                         ],
@@ -202,7 +202,7 @@ class _AchievementState extends State<Achievement> {
                               SizedBox(height: 36),
                               Text('单词本', style: TextStyle(color: Color(0xff282828), fontSize: 18)),
                               SizedBox(height: 4),
-                              Text('已添加 18 个单词', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
+                              Text('已添加 ${renderObject['info_detail']['word_book'].length} 个单词', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
                             ],
                           )
                         ],
@@ -221,6 +221,9 @@ class _AchievementState extends State<Achievement> {
             SizedBox(height: 20),
             Center(
               child: GestureDetector(
+                onTap: (){
+                  Navigator.pushNamed(context, '/note');
+                },
                 child: Container(
                   width: 374,
                   height: 120,
@@ -250,7 +253,7 @@ class _AchievementState extends State<Achievement> {
                               SizedBox(height: 36),
                               Text('阅读笔记', style: TextStyle(color: Color(0xff282828), fontSize: 18)),
                               SizedBox(height: 4),
-                              Text('共18条', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
+                              Text('共 ${renderObject['info_detail']['reading_note'].length} 条', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
                             ],
                           )
                         ],

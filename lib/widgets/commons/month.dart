@@ -21,6 +21,10 @@ class _MonthState extends State<Month> {
       for (var i = 0; i < widget.startDay - 1; i++) {
         widget.daysMap.insert(0, {'read': -1});
       }
+    } else {
+      for (var i = 0; i < 6; i++) {
+        widget.daysMap.insert(0, {'read': -1});
+      }
     }
     return Container(
       width: 375,

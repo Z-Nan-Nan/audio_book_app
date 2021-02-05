@@ -16,6 +16,7 @@ import 'package:audio_book_app/widgets/today/goldenMint.dart';
 import 'package:audio_book_app/widgets/today/mintTask.dart';
 import 'package:audio_book_app/widgets/usual/login.dart';
 import 'package:audio_book_app/widgets/usual/sign.dart';
+import 'package:audio_book_app/widgets/commons/ReadingNote.dart';
 
 class RouteName {
   static const String home = '/home';
@@ -33,6 +34,7 @@ class RouteName {
   static const String mintTask = '/mintTask';
   static const String login = '/login';
   static const String sign = '/sign';
+  static const String note = '/note';
 }
 
 class MintRouter {
@@ -68,6 +70,8 @@ class MintRouter {
         return MaterialPageRoute(builder: (_) => Login());
       case RouteName.sign:
         return MaterialPageRoute(builder: (_) => Sign());
+      case RouteName.note:
+        return MaterialPageRoute(builder: (_) => ReadingNote());
       default:
         return MaterialPageRoute(builder: (_) => Home());
     }

@@ -21,6 +21,14 @@ class _TodayState extends State<Today> {
 
   @override
   void initState() {
+    void test() async {
+      var res = await HttpUtils.request(
+          '/get_question_data',
+          method: HttpUtils.GET
+      );
+      var result = DataTransfer.fromJSON(res);
+    }
+    // test();
     void getUserInfo(cookies) async {
       print(cookies[0].value);
       var result = await HttpUtils.request(

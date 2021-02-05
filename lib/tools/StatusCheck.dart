@@ -8,7 +8,7 @@ class StatusCheck {
     return StatusCheck(
         status: json['status'],
         desc: json['desc'],
-        rId: json['rId']
+        rId: json['r_id']
     );
   }
 }

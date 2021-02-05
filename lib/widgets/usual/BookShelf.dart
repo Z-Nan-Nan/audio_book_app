@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:audio_book_app/widgets/commons/book.dart';
 import 'package:audio_book_app/widgets/commons/course.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class BookShelf extends StatefulWidget {
   @override
@@ -9,73 +13,31 @@ class BookShelf extends StatefulWidget {
 }
 
 class _BookShelfState extends State<BookShelf> {
-  List<Course> courses = [
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 15',
-      'bookName': 'One Day',
-      'termName': '第1期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020081311083151.jpeg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 41',
-      'bookName': '你当像鸟飞往你的山',
-      'termName': '第2期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020060517233085.jpeg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 7',
-      'bookName': '第十二夜',
-      'termName': '第3期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020051117451690.jpg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 22',
-      'bookName': '弗兰肯斯坦',
-      'termName': '第4期',
-      'cover': 'https://ali.baicizhan.com/readin/images/202004281128356.jpeg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 22',
-      'bookName': '地心游记',
-      'termName': '第4期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020053010221776.jpg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 22',
-      'bookName': '木偶奇遇记',
-      'termName': '第4期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020052018223837.jpg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 22',
-      'bookName': '小熊维尼',
-      'termName': '第4期',
-      'cover': 'https://ali.baicizhan.com/readin/images/202005121114535.jpg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 22',
-      'bookName': '查泰莱夫人的情人',
-      'termName': '第4期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020050714114531.jpeg',
-      'isDone': false
-    }),
-    Course.fromJSON({
-      'chapterLabel': 'Chapter 22',
-      'bookName': '天方夜谭',
-      'termName': '第4期',
-      'cover': 'https://ali.baicizhan.com/readin/images/2020042811282241.png',
-      'isDone': false
-    }),
-  ];
+  List<Course> courses = [];
   bool modalVisible = false;
   List selectKind = [true, false, false];
+  @override
+  void initState() {
+    void getRenderInfo(cookie) async {
+      var result = await HttpUtils.request(
+        '/get_user_bookshelf_info?r_id=${cookie}',
+        method: HttpUtils.GET
+      );
+      var res = DataTransfer.fromJSON(result);
+      setState(() {
+        for (var item in res.data) {
+          print(item);
+          courses.add(Course.fromJSON(item));
+        }
+      });
+    }
+    void getCookie() async{
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      getRenderInfo(cookies[0].value);
+    }
+    getCookie();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 375, height: 731)..init(context);
@@ -106,7 +68,20 @@ class _BookShelfState extends State<BookShelf> {
                                 children: [
                                   Book(height: 196, coverUrl: course.cover),
                                   GestureDetector(
-                                    onTap: (){
+                                    onTap: ()async{
+                                      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                      var flag = true;
+                                      for (var i in cookies) {
+                                        if (i.name == 'select_book') {
+                                          i.value = course.bookId;
+                                          flag = false;
+                                        }
+                                      }
+                                      if (flag) {
+                                        print('yes');
+                                        cookies.add(new Cookie('select_book', course.bookId));
+                                      }
+                                      (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
                                       Navigator.pushNamed(context, '/audioBook');
                                     },
                                     child: Container(
@@ -121,7 +96,19 @@ class _BookShelfState extends State<BookShelf> {
                               Text('${course.bookName}', style: TextStyle(color: Color(0xFF646464))),
                               SizedBox(height: 6),
                               GestureDetector(
-                                onTap: (){
+                                onTap: ()async{
+                                  List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                  bool flag = true;
+                                  for (var item in cookies) {
+                                    if (item.name == 'share_book_id') {
+                                      item.value = course.bookId;
+                                      flag = false;
+                                    }
+                                  }
+                                  if (flag) {
+                                    cookies.add(new Cookie('share_book_id', course.bookId));
+                                  }
+                                  (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
                                   Navigator.pushNamed(context, '/readingResult');
                                 },
                                 child: Row(
@@ -154,26 +141,26 @@ class _BookShelfState extends State<BookShelf> {
                           Image.asset('images/bookshelf_word.png', width: 61, height: 30)
                         ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: (){
-                              setState(() {
-                                modalVisible = true;
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                Text(selectKind[0] ? '按完成状态' : selectKind[1] ? '按难度级别' : '按书单期数', style: TextStyle(color: Color(0xFF00B4AA), fontWeight: FontWeight.w500)),
-                                SizedBox(width: 7),
-                                Image.asset('images/icon_toDown.png', width: 10, height: 8)
-                              ],
-                            ),
-                          )
-                        ],
-                      )
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.end,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: [
+                      //     GestureDetector(
+                      //       onTap: (){
+                      //         setState(() {
+                      //           modalVisible = true;
+                      //         });
+                      //       },
+                      //       child: Row(
+                      //         children: [
+                      //           Text(selectKind[0] ? '按完成状态' : selectKind[1] ? '按难度级别' : '按书单期数', style: TextStyle(color: Color(0xFF00B4AA), fontWeight: FontWeight.w500)),
+                      //           SizedBox(width: 7),
+                      //           Image.asset('images/icon_toDown.png', width: 10, height: 8)
+                      //         ],
+                      //       ),
+                      //     )
+                      //   ],
+                      // )
                     ],
                   ),
                 ),
