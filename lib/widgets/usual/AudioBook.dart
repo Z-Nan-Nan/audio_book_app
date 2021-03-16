@@ -19,6 +19,7 @@ class _AudioBookState extends State<AudioBook> {
   String audioUrl = '';
   List<AudioBookData> audioBookData = [];
   var renderObject = {};
+  String rId = '';
   List chapterList = [];
   bool clickAble = true;
   int selectId = null;
@@ -62,20 +63,22 @@ class _AudioBookState extends State<AudioBook> {
       clickAble = false;
       selectId = i;
       var flag = false;
-      for (var j in renderObject['note_collection']) {
-        if (j['pos'] == selectId - 3) {
+      if (renderObject['note_collection'] != null) {
+        for (var j in renderObject['note_collection']) {
+          if (j['pos'] == selectId - 3) {
+            setState(() {
+              flag = true;
+              isNote = j['content'];
+              hasNote = true;
+            });
+          }
+        }
+        if (!flag) {
           setState(() {
-            flag = true;
-            isNote = j['content'];
-            hasNote = true;
+            isNote = '';
+            hasNote = false;
           });
         }
-      }
-      if (!flag) {
-        setState(() {
-          isNote = '';
-          hasNote = false;
-        });
       }
       if (selectId == 3) {
         setState(() {
@@ -216,6 +219,9 @@ class _AudioBookState extends State<AudioBook> {
   void initState() {
     void getRenderInfo() async{
       List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      setState(() {
+        rId = cookies[0].value;
+      });
       var bookId = '';
       for (var i in cookies) {
         if (i.name == 'select_book') {
@@ -531,51 +537,53 @@ class _AudioBookState extends State<AudioBook> {
                             children: [
                               GestureDetector(
                                 onTap: (){
-                                  if (fontSizeSet['theme'] == 'medium') {
-                                    setState(() {
-                                      fontSizeSet = {
-                                        'theme': 'large',
-                                        'title': 36.0,
-                                        'vocabulary': 18.0,
-                                        'explain': 14.5,
-                                        'rawWord': 18.0,
-                                        'story': 14.5,
-                                        'question': 18.0,
-                                        'articleNum': 16.5,
-                                        'note': 18.0,
-                                        'article': 20.0
-                                      };
-                                    });
-                                  } else if (fontSizeSet['theme'] == 'large') {
-                                    setState(() {
-                                      fontSizeSet = {
-                                        'theme': 'small',
-                                        'title': 32.0,
-                                        'vocabulary': 14.0,
-                                        'explain': 11.5,
-                                        'rawWord': 14.0,
-                                        'story': 11.5,
-                                        'question': 14.0,
-                                        'articleNum': 13.5,
-                                        'note': 14.0,
-                                        'article': 16.0
-                                      };
-                                    });
-                                  } else {
-                                    setState(() {
-                                      fontSizeSet = {
-                                        'theme': 'medium',
-                                        'title': 34.0,
-                                        'vocabulary': 16.0,
-                                        'explain': 13.0,
-                                        'rawWord': 16.0,
-                                        'story': 13.0,
-                                        'question': 16.0,
-                                        'articleNum': 15.0,
-                                        'note': 16.0,
-                                        'article': 18.0
-                                      };
-                                    });
+                                  if (opacityLevel != 0) {
+                                    if (fontSizeSet['theme'] == 'medium') {
+                                      setState(() {
+                                        fontSizeSet = {
+                                          'theme': 'large',
+                                          'title': 36.0,
+                                          'vocabulary': 18.0,
+                                          'explain': 14.5,
+                                          'rawWord': 18.0,
+                                          'story': 14.5,
+                                          'question': 18.0,
+                                          'articleNum': 16.5,
+                                          'note': 18.0,
+                                          'article': 20.0
+                                        };
+                                      });
+                                    } else if (fontSizeSet['theme'] == 'large') {
+                                      setState(() {
+                                        fontSizeSet = {
+                                          'theme': 'small',
+                                          'title': 32.0,
+                                          'vocabulary': 14.0,
+                                          'explain': 11.5,
+                                          'rawWord': 14.0,
+                                          'story': 11.5,
+                                          'question': 14.0,
+                                          'articleNum': 13.5,
+                                          'note': 14.0,
+                                          'article': 16.0
+                                        };
+                                      });
+                                    } else {
+                                      setState(() {
+                                        fontSizeSet = {
+                                          'theme': 'medium',
+                                          'title': 34.0,
+                                          'vocabulary': 16.0,
+                                          'explain': 13.0,
+                                          'rawWord': 16.0,
+                                          'story': 13.0,
+                                          'question': 16.0,
+                                          'articleNum': 15.0,
+                                          'note': 16.0,
+                                          'article': 18.0
+                                        };
+                                      });
+                                    }
                                   }
                                 },
                                 child: Container(
@@ -588,62 +596,78 @@ class _AudioBookState extends State<AudioBook> {
                                 ),
                               ),
                               Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent
+                                ),
+                                width: 240,
+                                height: 50,
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: chapterList.map((item){
                                       return (
                                           GestureDetector(
                                             onTap: ()async{
-                                              int re = await audioPlayer.release();
-                                              if (re == 1) {
-                                                setState(() {
-                                                  isMin = 0;
-                                                  isSecond = 0;
-                                                  selectArticle = 'a_00${int.parse(item) > 10 ? '' : '0'}$item';
-                                                });
-                                                var res = await HttpUtils.request(
-                                                    '/get_audio_book_info?b_id=b_0001&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item',
-                                                    method: HttpUtils.GET
-                                                );
-                                                var result = DataTransfer.fromJSON(res);
-                                                setState(() {
-                                                  allMin = (result.data['audio'][0]['duration'] / 1000 / 60).floor();
-                                                  allSecond = (result.data['audio'][0]['duration'] / 1000 - allMin * 60).floor();
-                                                  audioUrl = (result.data['audio'][0]['audio_url']);
-                                                  audioBookData = [];
-                                                  audioBookData.add(AudioBookData.fromJSON(result.data));
-                                                  renderObject = result.data;
-                                                  chapterList = result.data['chapter_collection'];
-                                                });
-                                                print('release success');
-                                              } else {
-                                                print('release failed');
+                                              if (opacityLevel != 0) {
+                                                int re = await audioPlayer.release();
+                                                if (re == 1) {
+                                                  setState(() {
+                                                    isMin = 0;
+                                                    isSecond = 0;
+                                                    selectArticle = 'a_00${int.parse(item) > 10 ? '' : '0'}$item';
+                                                  });
+                                                  var res = await HttpUtils.request(
+                                                      '/get_audio_book_info?b_id=b_0001&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item&r_id=$rId',
+                                                      method: HttpUtils.GET
+                                                  );
+                                                  var result = DataTransfer.fromJSON(res);
+                                                  setState(() {
+                                                    allMin = (result.data['audio'][0]['duration'] / 1000 / 60).floor();
+                                                    allSecond = (result.data['audio'][0]['duration'] / 1000 - allMin * 60).floor();
+                                                    audioUrl = (result.data['audio'][0]['audio_url']);
+                                                    audioBookData = [];
+                                                    audioBookData.add(AudioBookData.fromJSON(result.data));
+                                                    renderObject = result.data;
+                                                    chapterList = result.data['chapter_collection'];
+                                                  });
+                                                  print('release success');
+                                                } else {
+                                                  print('release failed');
+                                                }
                                               }
                                             },
-                                            child: Container(
-                                              width: 43,
-                                              height: 43,
-                                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(0.0, 9.0), blurRadius: 18.0, spreadRadius: 1.0)]),
-                                              child: Center(
-                                                child: Text('day $item', style: TextStyle(color: Colors.black, fontSize: fontSizeSet['articleNum'], fontFamily: 'NewYork')),
-                                              ),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(width: 2),
+                                                Container(
+                                                  width: 45,
+                                                  height: 45,
+                                                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(22)), boxShadow: [BoxShadow(color: Color(0x33000000),offset: Offset(2.0, 2.0), blurRadius: 2.0, spreadRadius: 1.0)]),
+                                                  child: Center(
+                                                    child: Text('day $item', style: TextStyle(color: Colors.black, fontSize: fontSizeSet['articleNum'], fontFamily: 'NewYork')),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 2)
+                                              ],
                                             ),
                                           )
                                       );
-                                    }).toList()
+                                    }).toList(),
                                   ),
                                 )
                               ),
                               GestureDetector(
                                 onTap: (){
-                                  setState(() {
-                                    if (theme == 'brown') {
-                                      theme = 'green';
-                                    } else {
-                                      theme = 'brown';
-                                    }
-                                  });
+                                  if (opacityLevel != 0) {
+                                    setState(() {
+                                      if (theme == 'brown') {
+                                        theme = 'green';
+                                      } else {
+                                        theme = 'brown';
+                                      }
+                                    });
+                                  }
                                 },
                                 child: Container(
                                   width: 43,

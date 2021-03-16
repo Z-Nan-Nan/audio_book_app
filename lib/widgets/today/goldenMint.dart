@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class GoldenMint extends StatefulWidget {
   @override
@@ -10,9 +14,26 @@ class _GoldenMintState extends State<GoldenMint> {
   GlobalKey controlKey = new GlobalKey();
   bool showTopTab = false;
   ScrollController _controller = new ScrollController();
+  var renderObject = {};
 
   @override
   void initState() {
+    void getRenderInfo(id)async {
+      var result = await HttpUtils.request(
+        '/get_gold_info?r_id=$id',
+        method: HttpUtils.GET
+      );
+      var res = DataTransfer.fromJSON(result);
+      print(res.data);
+      setState(() {
+        renderObject = res.data;
+      });
+    }
+    void getCookie()async {
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      getRenderInfo(cookies[0].value);
+    }
+    getCookie();
     super.initState();
     _controller.addListener(() {
       RenderBox box = controlKey.currentContext.findRenderObject();
@@ -196,9 +217,9 @@ class _GoldenMintState extends State<GoldenMint> {
                                                     ],
                                                   ),
                                                   SizedBox(height: 9),
-                                                  Text('女性成长系列', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w500)),
+                                                  Text('${renderObject['group_name']}', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w500)),
                                                   SizedBox(height: 7),
-                                                  Text('第8周，1天后进入下周', style: TextStyle(color: Color(0xFF646464), fontSize: 11, fontWeight: FontWeight.w500)),
+                                                  Text('第${renderObject['is_week']}周，${renderObject['day_num']}天后进入下周', style: TextStyle(color: Color(0xFF646464), fontSize: 11, fontWeight: FontWeight.w500)),
                                                   SizedBox(height: 27),
                                                   Container(
                                                     width: 62,
@@ -223,7 +244,7 @@ class _GoldenMintState extends State<GoldenMint> {
                                                             begin: Alignment.bottomCenter,
                                                             end: Alignment.topCenter,
                                                             colors: [Color(0xFFFFC537), Color(0xFFFFEDD0), Colors.transparent],
-                                                            stops: [0, .62, 1]
+                                                            stops: [0, renderObject['right_count'] / 21, 1]
                                                         )),
                                                       ),
                                                       Container(
@@ -237,7 +258,7 @@ class _GoldenMintState extends State<GoldenMint> {
                                                             children: [
                                                               Text('答对题数', style: TextStyle(color: Color(0xFF646464), fontSize: 11, fontWeight: FontWeight.w500)),
                                                               SizedBox(height: 4),
-                                                              Text('8/14', style: TextStyle(color: Color(0xFF282828), fontSize: 22))
+                                                              Text('${renderObject['right_count']}/21', style: TextStyle(color: Color(0xFF282828), fontSize: 22))
                                                             ],
                                                           ),
                                                         ),
@@ -305,7 +326,7 @@ class _GoldenMintState extends State<GoldenMint> {
                                                     ],
                                                   ),
                                                   SizedBox(height: 9),
-                                                  Text('女性成长系列', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w500)),
+                                                  Text('${renderObject['group_name']}', style: TextStyle(color: Color(0xff282828), fontWeight: FontWeight.w500)),
                                                   SizedBox(height: 7),
                                                   Text('100天后过期', style: TextStyle(color: Color(0xFF646464), fontSize: 11, fontWeight: FontWeight.w500)),
                                                   SizedBox(height: 27),
@@ -332,7 +353,7 @@ class _GoldenMintState extends State<GoldenMint> {
                                                             begin: Alignment.bottomCenter,
                                                             end: Alignment.topCenter,
                                                             colors: [Color(0xFFFFC537), Color(0xFFFFEDD0), Colors.transparent],
-                                                            stops: [0, .62, 1]
+                                                            stops: [0, renderObject['finish_num'] / 80, 1]
                                                         )),
                                                       ),
                                                       Container(
@@ -346,7 +367,7 @@ class _GoldenMintState extends State<GoldenMint> {
                                                             children: [
                                                               Text('已读天数', style: TextStyle(color: Color(0xFF646464), fontSize: 11, fontWeight: FontWeight.w500)),
                                                               SizedBox(height: 4),
-                                                              Text('46/80', style: TextStyle(color: Color(0xFF282828), fontSize: 22))
+                                                              Text('${renderObject['finish_num']}/80', style: TextStyle(color: Color(0xFF282828), fontSize: 22))
                                                             ],
                                                           ),
                                                         ),

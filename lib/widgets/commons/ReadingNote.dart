@@ -21,11 +21,9 @@ class _ReadingNoteState extends State<ReadingNote> {
       var result = DataTransfer.fromJSON(res);
       print(result);
       for (var i in result.data) {
-        for (var j in i['notes']) {
-          setState(() {
-            count++;
-          });
-        }
+        setState(() {
+          count++;
+        });
       }
       setState(() {
         renderObject = result.data;
@@ -66,7 +64,49 @@ class _ReadingNoteState extends State<ReadingNote> {
                 Container(width: 20, height: 2, decoration: BoxDecoration(color: Color(0xFF00B4AA)))
               ],
             ),
-            SizedBox(height: 18)
+            SizedBox(height: 18),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: renderObject.map((item) {
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${item['date'].split('/')[0]}.${item['date'].split('/')[1]}.${item['date'].split('/')[2]}', style: TextStyle(color: Color(0xFF282828), fontFamily: 'NewYork', fontStyle: FontStyle.italic, fontSize: 16)),
+                      SizedBox(height: 9),
+                      Text('${item['content']}', style: TextStyle(color: Color(0xFF282828))),
+                      SizedBox(height: 13),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 2,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF646464)
+                            ),
+                          ),
+                          SizedBox(width: 17),
+                          Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('${item['sentence']}', style: TextStyle(color: Color(0xFF646464), fontSize: 13)),
+                                SizedBox(height: 12),
+                                Text('${item['name_cn']}Chapter${item['day']}', style: TextStyle(fontSize: 13, color: Color(0x88282828)))
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      Divider()
+                    ],
+                  ),
+                );
+              }).toList(),
+            )
           ],
         ),
       ),

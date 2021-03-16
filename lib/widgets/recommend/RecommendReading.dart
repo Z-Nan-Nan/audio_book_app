@@ -12,8 +12,12 @@ class RecommendReading extends StatefulWidget {
 }
 
 class _RecommendReadingState extends State<RecommendReading> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  List _readingTab = ['全部', '书单推荐', '看见TA们', 'Mint News', '话题'];
+  List _readingTab = ['全部', '书单故事', '看见TA们', 'Mint News', '浅荷话题'];
   List <Pgc> pgcList = [];
+  List <Pgc> pgc1 = [];
+  List <Pgc> pgc2 = [];
+  List <Pgc> pgc3 = [];
+  List <Pgc> pgc4 = [];
   TabController _tabController;
   @protected
   bool get wantKeepAlive => true;
@@ -29,8 +33,19 @@ class _RecommendReadingState extends State<RecommendReading> with TickerProvider
       print(res.data);
       setState(() {
         for (var i in res.data['pgc_list']) {
-          print(i);
           pgcList.add(Pgc.fromJSON(i));
+          if (i['tag'] == '书单故事') {
+            pgc1.add(Pgc.fromJSON(i));
+          }
+          if (i['tag'] == '看见TA们') {
+            pgc2.add(Pgc.fromJSON(i));
+          }
+          if (i['tag'] == 'Mint News') {
+            pgc3.add(Pgc.fromJSON(i));
+          }
+          if (i['tag'] == '浅荷话题') {
+            pgc4.add(Pgc.fromJSON(i));
+          }
         }
       });
     }
@@ -66,94 +81,297 @@ class _RecommendReadingState extends State<RecommendReading> with TickerProvider
             child: TabBarView(
               controller: _tabController,
               children: _readingTab.map((value) {
-                return SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: pgcList.map((item) {
-                          return PGCTags(
-                            sTag: item.sTag,
-                            title: item.title,
-                            subTitle: item.subTitle,
-                            like: item.like,
-                            cover: item.cover,
-                            aId: item.aId,
-                          );
-                        }).toList()
-                          // InkWell(
-                          //   highlightColor: Colors.transparent,
-                          //   radius: 0.0,
-                          //   onTap: (){
-                          //     Navigator.pushNamed(context, '/article');
-                          //   },
-                          //   child: PGCTags(
-                          //     sTag: '看见他们',
-                          //     title: '薄荷专访赵又廷，你想听的都在这里',
-                          //     subTitle: '我们共同完成首部明星英文有声书',
-                          //     like: 1314,
-                          //     color: Colors.lightGreenAccent,
-                          //   ),
-                          // ),
-                          // SizedBox(height: 30),
-                          // PGCTags(
-                          //     sTag: 'Mint News',
-                          //     title: '用户给送过的奇葩礼物',
-                          //     subTitle: '带你探索故事最初的样子',
-                          //     like: 1314
-                          // ),
-                          // SizedBox(height: 30),
-                          // PGCTags(
-                          //     sTag: '浅荷话题',
-                          //     title: '真的有圣诞老人吗？',
-                          //     subTitle: '又是一年圣诞，南方的冬日暖阳白花花，虽过不了白色圣诞节，过白日圣诞也是好的。',
-                          //     like: 622
-                          // ),
-                          // SizedBox(height: 20),
-                          // PGCTags(
-                          //     sTag: '新书推荐',
-                          //     title: '早晨来而复去，白昼却不曾降临',
-                          //     subTitle: '吸血鬼缘何成为「偶像派」？',
-                          //     like: 1314,
-                          //     color: Colors.black26
-                          // ),
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                        height: 48,
-                        width: 335,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            color: Color(0xFFFFFFFF)
+                if (value == '全部') {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: pgcList.map((item) {
+                              return Column(
+                                children: [
+                                  PGCTags(
+                                    sTag: item.sTag,
+                                    title: item.title,
+                                    subTitle: item.subTitle,
+                                    like: item.like,
+                                    cover: item.cover,
+                                    pId: item.pId,
+                                  ),
+                                  SizedBox(height: 30)
+                                ],
+                              );
+                            }).toList()
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 16),
-                                Text('到底啦，告诉薄荷你还想看什么书', style: TextStyle(color: Color(0xFF282828), fontSize: 14),)
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Icon(Icons.arrow_forward_ios_outlined),
-                                SizedBox(width: 16)
-                              ],
-                            )
-                          ],
+                        SizedBox(height: 20),
+                        Container(
+                          height: 48,
+                          width: 335,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Color(0xFFFFFFFF)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 16),
+                                  Text('到底啦，告诉浅荷你还想看什么书', style: TextStyle(color: Color(0xFF282828), fontSize: 14),)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.arrow_forward_ios_outlined),
+                                  SizedBox(width: 16)
+                                ],
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 100)
-                    ],
-                  ),
-                );
+                        SizedBox(height: 100)
+                      ],
+                    ),
+                  );
+                } else if (value == '书单故事') {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: pgc1.map((item) {
+                              return Column(
+                                children: [
+                                  PGCTags(
+                                    sTag: item.sTag,
+                                    title: item.title,
+                                    subTitle: item.subTitle,
+                                    like: item.like,
+                                    cover: item.cover,
+                                    pId: item.pId,
+                                  ),
+                                  SizedBox(height: 30)
+                                ],
+                              );
+                            }).toList()
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                          height: 48,
+                          width: 335,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Color(0xFFFFFFFF)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 16),
+                                  Text('到底啦，告诉浅荷你还想看什么书', style: TextStyle(color: Color(0xFF282828), fontSize: 14),)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.arrow_forward_ios_outlined),
+                                  SizedBox(width: 16)
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 100)
+                      ],
+                    ),
+                  );
+                } else if (value == '看见TA们') {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: pgc2.map((item) {
+                              return Column(
+                                children: [
+                                  PGCTags(
+                                    sTag: item.sTag,
+                                    title: item.title,
+                                    subTitle: item.subTitle,
+                                    like: item.like,
+                                    cover: item.cover,
+                                    pId: item.pId,
+                                  ),
+                                  SizedBox(height: 30)
+                                ],
+                              );
+                            }).toList()
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                          height: 48,
+                          width: 335,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Color(0xFFFFFFFF)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 16),
+                                  Text('到底啦，告诉浅荷你还想看什么书', style: TextStyle(color: Color(0xFF282828), fontSize: 14),)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.arrow_forward_ios_outlined),
+                                  SizedBox(width: 16)
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 100)
+                      ],
+                    ),
+                  );
+                } else if (value == 'Mint News') {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: pgc3.map((item) {
+                              return Column(
+                                children: [
+                                  PGCTags(
+                                    sTag: item.sTag,
+                                    title: item.title,
+                                    subTitle: item.subTitle,
+                                    like: item.like,
+                                    cover: item.cover,
+                                    pId: item.pId,
+                                  ),
+                                  SizedBox(height: 30)
+                                ],
+                              );
+                            }).toList()
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                          height: 48,
+                          width: 335,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Color(0xFFFFFFFF)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 16),
+                                  Text('到底啦，告诉浅荷你还想看什么书', style: TextStyle(color: Color(0xFF282828), fontSize: 14),)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.arrow_forward_ios_outlined),
+                                  SizedBox(width: 16)
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 100)
+                      ],
+                    ),
+                  );
+                } else if (value == '浅荷话题') {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: pgc4.map((item) {
+                              return Column(
+                                children: [
+                                  PGCTags(
+                                    sTag: item.sTag,
+                                    title: item.title,
+                                    subTitle: item.subTitle,
+                                    like: item.like,
+                                    cover: item.cover,
+                                    pId: item.pId,
+                                  ),
+                                  SizedBox(height: 30)
+                                ],
+                              );
+                            }).toList()
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                          height: 48,
+                          width: 335,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Color(0xFFFFFFFF)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 16),
+                                  Text('到底啦，告诉浅荷你还想看什么书', style: TextStyle(color: Color(0xFF282828), fontSize: 14),)
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon(Icons.arrow_forward_ios_outlined),
+                                  SizedBox(width: 16)
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 100)
+                      ],
+                    ),
+                  );
+                }
               }).toList(),
             ),
           ),

@@ -39,7 +39,7 @@ class _ArticleState extends State<Article> {
               '/get_article_detail',
               method: HttpUtils.POST,
               data: {
-                'a_id': i.value,
+                'p_id': i.value,
                 'r_id': cookies[0].value
               }
           );
@@ -423,7 +423,7 @@ class _ArticleState extends State<Article> {
                               method: 'post',
                               data: {
                                 'r_id': cookies[0].value,
-                                'a_id': articleId,
+                                'p_id': articleId,
                                 'comment': newComment
                               }
                             );

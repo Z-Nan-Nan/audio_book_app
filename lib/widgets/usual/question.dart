@@ -13,6 +13,8 @@ class _QuestionState extends State<Question> {
   int finishNum = 0;
   int allNum = 3;
   int option = 3;
+  int rightNum = 0;
+  String userRId = '';
   var renderObject = [];
   bool isExplain = true;
   var questionCollection = {
@@ -48,6 +50,9 @@ class _QuestionState extends State<Question> {
     }
     void getCookie() async {
       List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      setState(() {
+        userRId = cookies[0].value;
+      });
       String article = '';
       String book = '';
       for (var i in cookies) {
@@ -251,6 +256,7 @@ class _QuestionState extends State<Question> {
                               lastOne = true;
                             }
                             if (option == questionCollection['answers']) {
+                              rightNum++;
                               isRight = true;
                             } else {
                               isRight = false;
@@ -417,7 +423,7 @@ class _QuestionState extends State<Question> {
                     ),
                     SizedBox(height: 18),
                     GestureDetector(
-                      onTap: (){
+                      onTap: ()async{
                         setState(() {
                           if (finishNum == 0) {
                             questionCollection = {
@@ -443,7 +449,17 @@ class _QuestionState extends State<Question> {
                           option = 3;
                         });
                         if (lastOne) {
-                          Navigator.pushNamed(context, '/today');
+                          var result = await HttpUtils.request(
+                            '/send_read_info',
+                          method: HttpUtils.POST,
+                          data: {
+                            'r_id': userRId,
+                            'right_num': rightNum
+                          });
+                          if (DataTransfer.fromJSON(result).status == 1) {
+                            print('ok');
+                          }
+                        Navigator.pushNamed(context, '/today');
                         }
                         // Navigator.pushNamed(context, '/explain');
                       },

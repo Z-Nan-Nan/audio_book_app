@@ -4,8 +4,8 @@ class Pgc {
   final String subTitle;
   final int like;
   final String cover;
-  final String aId;
-  Pgc({ this.sTag, this.title, this.subTitle, this.like, this.cover, this.aId });
+  final String pId;
+  Pgc({ this.sTag, this.title, this.subTitle, this.like, this.cover, this.pId });
 
   factory Pgc.fromJSON(Map<String, dynamic> json) {
     return Pgc(
@@ -14,7 +14,7 @@ class Pgc {
         subTitle: json['subTitle'],
         like: json['like'],
         cover: json['cover'],
-        aId: json['a_id']
+        pId: json['p_id']
     );
   }
 }
