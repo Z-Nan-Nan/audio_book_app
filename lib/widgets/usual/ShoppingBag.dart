@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:audio_book_app/net/api.dart';
 import 'package:flutter/material.dart';
 import 'package:audio_book_app/widgets/recommend/ListData_test.dart';
-
 import 'package:audio_book_app/net/dio_manager.dart';
 import 'package:audio_book_app/tools/DataTransfer.dart';
 
@@ -17,6 +16,7 @@ class _ShoppingBagState extends State<ShoppingBag> {
   bool chooseAll = true;
   int allPay = 0;
   int allCount = 0;
+  bool isManage = false;
   @override
   void initState() {
     void getGroupList(cookie) async {
@@ -68,7 +68,12 @@ class _ShoppingBagState extends State<ShoppingBag> {
           FlatButton(
             height: 28,
             minWidth: 28,
-            child: Text('管理', style: TextStyle(color: Color(0xFF282828), fontSize: 16),),
+            child: Text('管理', style: TextStyle(color: Color(0xFF282828), fontSize: 16)),
+            onPressed: (){
+              setState(() {
+                isManage = !isManage;
+              });
+            },
           )
         ],
       ),
@@ -253,13 +258,40 @@ class _ShoppingBagState extends State<ShoppingBag> {
                                 FlatButton(
                                   minWidth: 106,
                                   height: 40,
-                                  color: Color(0xFF00B4AA),
+                                  color: isManage ? Colors.red : Color(0xFF00B4AA),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.all(Radius.circular(28))
                                   ),
-                                  child: Text('去结算', style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),),
-                                  onPressed: (){
-                                    print(1);
+                                  child: Text(isManage ? '删除' : '去结算', style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),),
+                                  onPressed: ()async{
+                                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                    if (isManage) {
+                                      for (var i in booksList) {
+                                        if (i.buy == true) {
+                                          var res = HttpUtils.request(
+                                            '/post_shoppingcart_info',
+                                            method: HttpUtils.POST,
+                                            data: {
+                                              'rId': cookies[0].value,
+                                              'groupId': i.groupId,
+                                              'buy': false
+                                            }
+                                          );
+                                        }
+                                      }
+                                    } else {
+                                      var res = await HttpUtils.request(
+                                          '/clear_shopping',
+                                          method: HttpUtils.POST,
+                                          data: {
+                                            'r_id': cookies[0].value
+                                          }
+                                      );
+                                      var result = DataTransfer.fromJSON(res);
+                                      if (result.status == 1) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    }
                                   },
                                 )
                               ],

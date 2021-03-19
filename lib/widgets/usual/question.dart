@@ -449,12 +449,28 @@ class _QuestionState extends State<Question> {
                           option = 3;
                         });
                         if (lastOne) {
+                          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                          setState(() {
+                            userRId = cookies[0].value;
+                          });
+                          String article = '';
+                          String book = '';
+                          for (var i in cookies) {
+                            if (i.name == 'articleId') {
+                              article = i.value;
+                            }
+                            if (i.name == 'select_book') {
+                              book = i.value;
+                            }
+                          }
                           var result = await HttpUtils.request(
                             '/send_read_info',
                           method: HttpUtils.POST,
                           data: {
                             'r_id': userRId,
-                            'right_num': rightNum
+                            'right_num': rightNum,
+                            'book_id': book,
+                            'a_id': article
                           });
                           if (DataTransfer.fromJSON(result).status == 1) {
                             print('ok');

@@ -239,18 +239,10 @@ class _AudioBookState extends State<AudioBook> {
         audioUrl = (result.data['audio'][0]['audio_url']);
         audioBookData.add(AudioBookData.fromJSON(result.data));
         renderObject = result.data;
+        selectArticle = result.data['a_id'];
         chapterList = result.data['chapter_collection'];
       });
     }
-    void test() async{
-      var res = await HttpUtils.request(
-          '/get_audio_book_data',
-          method: HttpUtils.GET
-      );
-      var result = DataTransfer.fromJSON(res);
-      print(result);
-    }
-    // test();
     getRenderInfo();
     super.initState();
   }
@@ -617,8 +609,15 @@ class _AudioBookState extends State<AudioBook> {
                                                     isSecond = 0;
                                                     selectArticle = 'a_00${int.parse(item) > 10 ? '' : '0'}$item';
                                                   });
+                                                  List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                                  var bookId = '';
+                                                  for (var i in cookies) {
+                                                    if (i.name == 'select_book') {
+                                                      bookId = i.value;
+                                                    }
+                                                  }
                                                   var res = await HttpUtils.request(
-                                                      '/get_audio_book_info?b_id=b_0001&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item&r_id=$rId',
+                                                      '/get_audio_book_info?b_id=$bookId&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item&r_id=$rId',
                                                       method: HttpUtils.GET
                                                   );
                                                   var result = DataTransfer.fromJSON(res);
