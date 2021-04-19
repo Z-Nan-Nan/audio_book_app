@@ -67,7 +67,7 @@ class _LoginState extends State<Login> {
                       onTap: ()async {
                         print('${username}--${password}');
                         var result = await HttpUtils.request(
-                            '/login',
+                            '/api_login',
                             method: HttpUtils.POST,
                             data: {
                               'account': username,
@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
                           List<Cookie> cookies = [
                             new Cookie('rId', res.rId)
                           ];
-                          (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                          (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Home()), (route) => route == null);
                         } else {
                           setState(() {

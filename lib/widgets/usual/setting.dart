@@ -1,9 +1,14 @@
 import 'dart:io';
-
+import 'package:alarm_calendar/alarm_calendar_plugin.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:audio_book_app/net/api.dart';
+import 'package:dio/dio.dart';
+import 'dart:io';
+import 'package:audio_book_app/net/api.dart';
+import 'package:audio_book_app/net/dio_manager.dart';
+import 'package:audio_book_app/tools/DataTransfer.dart';
 
 class Setting extends StatefulWidget {
   @override
@@ -142,71 +147,141 @@ class _SettingState extends State<Setting> {
                   children: [
                     Text('阅读提醒设置', style: TextStyle(color: Color(0xFF282828))),
                     Container(
-                      width: 72,
-                      height: 25,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(4)), border: Border.all(color: Color(0xFF00B4AA), width: 2)),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 26,
-                            height: 25,
-                            child: NotificationListener(
-                              onNotification: (ScrollNotification note){
-                                var position = note.metrics.pixels.toInt() / 20;
-                                setState(() {
-                                  hPosition = position.roundToDouble();
-                                });
-                              },
-                              child: ListView.builder(
-                                itemCount: 24,
-                                controller: controller,
-                                cacheExtent: 1.0,
-                                padding: EdgeInsets.only(top: 0),
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    height: 20,
-                                    child: Center(
-                                      child: Text('${index < 10 ? '0${index}' : index}', style: TextStyle(color: Color(0xFF282828), fontSize: 19)),
-                                    ),
-                                  );
-                                },
-                              ),
-                            )
-                          ),
-                          SizedBox(width: 2),
-                          Text(':', style: TextStyle(color: Color(0xFF282828), fontSize: 18)),
-                          SizedBox(width: 2),
-                          Container(
-                              width: 26,
+                              width: 72,
                               height: 25,
-                              child: NotificationListener(
-                                onNotification: (ScrollNotification note){
-                                  var position = note.metrics.pixels.toInt() / 20;
-                                  setState(() {
-                                    sPosition = position.roundToDouble();
-                                  });
-                                },
-                                child: ListView.builder(
-                                  itemCount: 60,
-                                  controller: controller1,
-                                  cacheExtent: 1.0,
-                                  padding: EdgeInsets.only(top: 0),
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return Container(
-                                      height: 20,
-                                      child: Center(
-                                        child: Text('${index < 10 ? '0${index}' : index}', style: TextStyle(color: Color(0xFF282828), fontSize: 19)),
-                                      ),
-                                    );
-                                  },
-                                ),
+                              decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(4)), border: Border.all(color: Color(0xFF00B4AA), width: 2)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      width: 26,
+                                      height: 25,
+                                      child: NotificationListener(
+                                        onNotification: (ScrollNotification note){
+                                          var position = note.metrics.pixels.toInt() / 20;
+                                          setState(() {
+                                            hPosition = position.roundToDouble();
+                                          });
+                                        },
+                                        child: ListView.builder(
+                                          itemCount: 24,
+                                          controller: controller,
+                                          cacheExtent: 1.0,
+                                          padding: EdgeInsets.only(top: 0),
+                                          itemBuilder: (BuildContext context, int index) {
+                                            return Container(
+                                              height: 20,
+                                              child: Center(
+                                                child: Text('${index < 10 ? '0${index}' : index}', style: TextStyle(color: Color(0xFF282828), fontSize: 19)),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      )
+                                  ),
+                                  SizedBox(width: 2),
+                                  Text(':', style: TextStyle(color: Color(0xFF282828), fontSize: 18)),
+                                  SizedBox(width: 2),
+                                  Container(
+                                      width: 26,
+                                      height: 25,
+                                      child: NotificationListener(
+                                        onNotification: (ScrollNotification note){
+                                          var position = note.metrics.pixels.toInt() / 20;
+                                          setState(() {
+                                            sPosition = position.roundToDouble();
+                                          });
+                                        },
+                                        child: ListView.builder(
+                                          itemCount: 60,
+                                          controller: controller1,
+                                          cacheExtent: 1.0,
+                                          padding: EdgeInsets.only(top: 0),
+                                          itemBuilder: (BuildContext context, int index) {
+                                            return Container(
+                                              height: 20,
+                                              child: Center(
+                                                child: Text('${index < 10 ? '0${index}' : index}', style: TextStyle(color: Color(0xFF282828), fontSize: 19)),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      )
+                                  ),
+                                ],
                               )
                           ),
+                          SizedBox(width: 20),
+                          GestureDetector(
+                            onTap: ()async{
+                              print(hPosition.round());
+                              print(sPosition.round());
+                              var h = hPosition.round();
+                              var s = sPosition.round();
+                              Calendars calendars = new Calendars(DateTime(2021,3,23,h,s),DateTime(2021,3,23,h,s),'浅荷阅读','读书时间到啦！',[0],'1',0);
+                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
+                              var res = await HttpUtils.request(
+                                '/api_set_clock?r_id=${cookies[0].value}&eventId=0',
+                                method: HttpUtils.GET
+                              );
+                              var result = DataTransfer.fromJSON(res);
+                              if (result.status == 2) {
+                                await AlarmCalendar.CheckReadPermission().then((res) async {
+                                  if(res){
+                                    //查询是否有写权限
+                                    await AlarmCalendar.CheckWritePermission().then((resWrite) async{
+                                      if(resWrite){
+                                        final id = await AlarmCalendar.createEvent(calendars);
+                                        calendars.setEventId = id;
+                                        print('获得ID为：'+id);
+                                        var res1 = await HttpUtils.request(
+                                          '/api_set_clock?r_id=${cookies[0].value}&eventId=$id',
+                                          method: HttpUtils.GET
+                                        );
+                                        var ret1 = DataTransfer.fromJSON(res1);
+                                        if (ret1.status == 1) {
+                                          print('ok');
+                                        }
+                                      }
+                                    });
+                                  }
+                                });
+                              } else {
+                                AlarmCalendar.deleteEvent(result.data);
+                                calendars.setEventId = '';
+                                await AlarmCalendar.CheckWritePermission().then((resWrite) async{
+                                  if(resWrite){
+                                    final id = await AlarmCalendar.createEvent(calendars);
+                                    calendars.setEventId = id;
+                                    print('获得ID为：'+id);
+                                    var res1 = await HttpUtils.request(
+                                        '/api_set_clock?r_id=${cookies[0].value}&eventId=$id',
+                                        method: HttpUtils.GET
+                                    );
+                                    var ret1 = DataTransfer.fromJSON(res1);
+                                    if (ret1.status == 1) {
+                                      print('ok');
+                                    }
+                                  }
+                                });
+                              }
+                            },
+                            child: Container(
+                              width: 50,
+                              height: 30,
+                              decoration: BoxDecoration(color: Color(0xFF00B4AA), borderRadius: BorderRadius.all(Radius.circular(13))),
+                              child: Center(
+                                child: Text('确定', style: TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                          )
                         ],
-                      )
-                    )
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -216,8 +291,11 @@ class _SettingState extends State<Setting> {
             bottom: 0,
             child: GestureDetector(
               onTap: () async{
-                List<Cookie> cookies = [];
-                (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
+                for (var i in cookies) {
+                  i.value = '';
+                }
+                (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                 Navigator.pushNamed(context, '/login');
               },
               child: Container(

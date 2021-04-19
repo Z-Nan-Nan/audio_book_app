@@ -37,7 +37,7 @@ class _ReadingResultState extends State<ReadingResult> {
   void initState() {
     void getRenderInfo(info, book) async{
       var result = await HttpUtils.request(
-        '/get_share_book_info?r_id=$info&book_id=$book',
+        '/api_get_share_book_info?r_id=$info&book_id=$book',
         method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -49,7 +49,7 @@ class _ReadingResultState extends State<ReadingResult> {
       });
     }
     void getCookie() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       for (var item in cookies) {
         if (item.name == 'share_book_id') {
           getRenderInfo(cookies[0].value, item.value);
@@ -153,7 +153,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             setState(() {
                                               starCount = 1;
                                             });
-                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                             bool flag = true;
                                             for (var item in cookies) {
                                               if (item.name == 'share_book_rate') {
@@ -164,7 +164,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             if (flag) {
                                               cookies.add(new Cookie('share_book_rate', '1'));
                                             }
-                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                           },
                                           child: Image.asset('images/star_white.png', width: 18, height: 18),
                                         ),
@@ -174,7 +174,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                               setState(() {
                                                 starCount = 2;
                                               });
-                                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                               bool flag = true;
                                               for (var item in cookies) {
                                                 if (item.name == 'share_book_rate') {
@@ -185,7 +185,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                               if (flag) {
                                                 cookies.add(new Cookie('share_book_rate', '2'));
                                               }
-                                              (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                              (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                             },
                                           child: starCount >= 2 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
@@ -195,7 +195,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                               setState(() {
                                                 starCount = 3;
                                               });
-                                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                              List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                               bool flag = true;
                                               for (var item in cookies) {
                                                 if (item.name == 'share_book_rate') {
@@ -206,7 +206,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                               if (flag) {
                                                 cookies.add(new Cookie('share_book_rate', '3'));
                                               }
-                                              (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                              (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                             },
                                           child: starCount >= 3 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
@@ -216,7 +216,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             setState(() {
                                               starCount = 4;
                                             });
-                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                             bool flag = true;
                                             for (var item in cookies) {
                                               if (item.name == 'share_book_rate') {
@@ -227,7 +227,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             if (flag) {
                                               cookies.add(new Cookie('share_book_rate', '4'));
                                             }
-                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                           },
                                           child: starCount >= 4 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
@@ -237,7 +237,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             setState(() {
                                               starCount = 5;
                                             });
-                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                             bool flag = true;
                                             for (var item in cookies) {
                                               if (item.name == 'share_book_rate') {
@@ -248,7 +248,7 @@ class _ReadingResultState extends State<ReadingResult> {
                                             if (flag) {
                                               cookies.add(new Cookie('share_book_rate', '5'));
                                             }
-                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                           },
                                           child: starCount == 5 ? Image.asset('images/star_white.png', width: 18, height: 18) : Image.asset('images/star_transparent.png', width: 18, height: 18),
                                         ),
@@ -412,9 +412,9 @@ class _ReadingResultState extends State<ReadingResult> {
                       isEditAble = false;
                       commentWord = controller.text;
                     });
-                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                     var result = await HttpUtils.request(
-                        '/save_temp_data',
+                        '/api_save_temp_data',
                         method: HttpUtils.POST,
                         data: {
                           'r_id': cookies[0].value,
@@ -422,7 +422,7 @@ class _ReadingResultState extends State<ReadingResult> {
                           'value': commentWord
                         });
                   } else {
-                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                     bool flag = true;
                     for (var item in cookies) {
                       if (item.name == 'share_book_rate') {
@@ -433,9 +433,9 @@ class _ReadingResultState extends State<ReadingResult> {
                     if (flag) {
                       cookies.add(new Cookie('share_book_rate', '$starCount'));
                     }
-                    (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                    (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                     var result = await HttpUtils.request(
-                        '/save_temp_data',
+                        '/api_save_temp_data',
                         method: HttpUtils.POST,
                         data: {
                           'r_id': cookies[0].value,

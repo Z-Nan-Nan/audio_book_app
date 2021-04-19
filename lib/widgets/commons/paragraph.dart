@@ -34,7 +34,9 @@ class _paragraphState extends State<paragraph> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12),
-        child: Text('${widget.sentence}', style: TextStyle(color: widget.refresh ? widget.color : isSelect ? widget.selectColor : widget.color, fontSize: widget.fontSizeSet, fontFamily: 'Charter', height: 2)),
+        child: Text('${widget.sentence}',
+            style: TextStyle(color: widget.refresh ? widget.color : isSelect ? widget.selectColor : widget.color,
+                fontSize: widget.fontSizeSet, fontFamily: 'Charter', height: 2)),
       ),
     );
   }

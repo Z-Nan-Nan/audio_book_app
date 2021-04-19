@@ -179,7 +179,7 @@ class _SignState extends State<Sign> {
                               onTap: ()async {
                                 var date = '${_dateTime.year}/${_dateTime.month}/${_dateTime.day}';
                                 var result = await HttpUtils.request(
-                                    '/sign',
+                                    '/api_sign',
                                     method: HttpUtils.POST,
                                     data: {
                                       'account': userIdLength,

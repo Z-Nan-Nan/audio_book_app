@@ -32,11 +32,11 @@ class _ArticleState extends State<Article> {
   @override
   void initState() {
     void getArticleDetail() async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       for (var i in cookies) {
         if (i.name == 'article') {
           var result = await HttpUtils.request(
-              '/get_article_detail',
+              '/api_get_article_detail',
               method: HttpUtils.POST,
               data: {
                 'p_id': i.value,
@@ -411,7 +411,7 @@ class _ArticleState extends State<Article> {
                         Text('       写留言', style: TextStyle(color: Color(0xFF282828), fontSize: 18, fontWeight: FontWeight.w600)),
                         GestureDetector(
                           onTap: () async{
-                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                             var articleId = '';
                             for (var i in cookies) {
                               if (i.name == 'article') {
@@ -419,7 +419,7 @@ class _ArticleState extends State<Article> {
                               }
                             }
                             var result = await HttpUtils.request(
-                              '/send_new_comment',
+                              '/api_send_new_comment',
                               method: 'post',
                               data: {
                                 'r_id': cookies[0].value,

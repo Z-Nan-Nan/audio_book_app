@@ -17,7 +17,7 @@ class _DailyPicturesState extends State<DailyPictures> {
   void initState() {
     getTopPic ()async {
       var result = await HttpUtils.request(
-          '/top_pic',
+          '/api_top_pic',
           method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);

@@ -34,7 +34,7 @@ class BookDetails extends StatelessWidget {
           child: Book(height: 192, coverUrl: cover,),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 13.0, bottom: 4.0),
+          padding: const EdgeInsets.only(top: 13.0, bottom: 3.0),
           child: Text(bookName, style: TextStyle(
               fontSize: 22.0,
               color: Color(0xFF282828),

@@ -25,7 +25,7 @@ class _RecommendReadingState extends State<RecommendReading> with TickerProvider
   void initState() {
     void getPGCList() async {
       var result = await HttpUtils.request(
-          '/get_pgc_list',
+          '/api_get_pgc_list',
           method: HttpUtils.GET,
           data: {}
       );

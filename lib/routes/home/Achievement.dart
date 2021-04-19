@@ -1,9 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:io';
 import 'package:audio_book_app/net/api.dart';
 import 'package:audio_book_app/net/dio_manager.dart';
 import 'package:audio_book_app/tools/DataTransfer.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Achievement extends StatefulWidget {
   @override
@@ -16,7 +18,7 @@ class _AchievementState extends State<Achievement> {
   void initState() {
     void getRenderInfo(cookie) async{
       var result = await HttpUtils.request(
-        '/get_person_info?r_id=$cookie',
+        '/api_get_person_info?r_id=$cookie',
         method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -25,7 +27,7 @@ class _AchievementState extends State<Achievement> {
       });
     }
     void getCookie() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getRenderInfo(cookies[0].value);
     }
     getCookie();
@@ -51,10 +53,39 @@ class _AchievementState extends State<Achievement> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('${renderObject['avatar']}'), fit: BoxFit.cover), borderRadius: BorderRadius.all(Radius.circular(15))),
+                    GestureDetector(
+                      onTap: ()async{
+                        final picker = ImagePicker();
+                        var pickedFile = await picker.getImage(source: ImageSource.gallery);
+                        print(pickedFile.path);
+                        String path = pickedFile.path;
+                        var name = path.substring(path.lastIndexOf("/") + 1, path.length);
+                        var suffix = name.substring(name.lastIndexOf(".") + 1, name.length);
+                        FormData formData = new FormData.fromMap({
+                          'name': 'media',
+                          'file': MultipartFile.fromFile(pickedFile.path, filename: "avatar.img"),
+                          // "media": MultipartFile.fromFile(pickedFile.path, filename: "avatar.img")
+                        });
+                        var dio = Dio();
+                        try {
+                          var res = await dio.post('http://localhost:3000/api_send_avatar', data: formData, options: new Options(contentType: 'multipart/form-data'));
+                          print(res);
+                        } catch(e){
+                          print(e.toString());
+                        }
+                        // var res = await HttpUtils.request(
+                        //   'http://rdmint-admin.baicizhan.com/api/abtest/upfile/images',
+                        //   method: HttpUtils.POST,
+                        //   data: {
+                        //     'media': formData
+                        //   }
+                        // );
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(image: DecorationImage(image: renderObject['avatar'] != null ? NetworkImage('${renderObject['avatar']}') : NetworkImage(''), fit: BoxFit.cover), border: Border.all(color: Colors.grey, width: 0.5), borderRadius: BorderRadius.all(Radius.circular(15))),
+                      ),
                     ),
                     SizedBox(width: 10),
                     Text('${renderObject['nickname']}', style: TextStyle(color: Color(0xFF282828), fontSize: 18, fontWeight: FontWeight.w600))
@@ -253,7 +284,7 @@ class _AchievementState extends State<Achievement> {
                               SizedBox(height: 36),
                               Text('阅读笔记', style: TextStyle(color: Color(0xff282828), fontSize: 18)),
                               SizedBox(height: 4),
-                              Text('共 ${renderObject['info_detail']['reading_note'].length} 条', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
+                              Text('共 ${renderObject['note_count']} 条', style: TextStyle(color: Color(0xFF646464), letterSpacing: 1))
                             ],
                           )
                         ],

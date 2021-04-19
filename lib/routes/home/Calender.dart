@@ -24,7 +24,7 @@ class _CalenderState extends State<Calender> {
   void initState() {
     void getRenderInfo(id) async{
       var result = await HttpUtils.request(
-        '/get_calender_info?r_id=$id',
+        '/api_get_calender_info?r_id=$id',
         method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -47,7 +47,7 @@ class _CalenderState extends State<Calender> {
       });
     }
     void getCookie() async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getRenderInfo(cookies[0].value);
     }
     getCookie();
@@ -197,16 +197,26 @@ class _CalenderState extends State<Calender> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][0]['img_src']}'),
-                              SizedBox(width: 14),
-                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][1]['img_src']}'),
-                              SizedBox(width: 14),
-                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][2]['img_src']}'),
-                              SizedBox(width: 14),
-                              Book(height: 115, coverUrl: '${renderObject['book_group_info'][3]['img_src']}'),
-                              SizedBox(width: 14),
-                            ],
+                            children: renderObject['book_group_info'].map<Widget>((item) {
+                              return Container(
+                                child: Row(
+                                  children: [
+                                    Book(height: 115, coverUrl: '${item['img_src']}'),
+                                    SizedBox(width: 14),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            // children: [
+                            //   Book(height: 115, coverUrl: '${renderObject['book_group_info'][0]['img_src']}'),
+                            //   SizedBox(width: 14),
+                            //   Book(height: 115, coverUrl: '${renderObject['book_group_info'][1]['img_src']}'),
+                            //   SizedBox(width: 14),
+                            //   Book(height: 115, coverUrl: '${renderObject['book_group_info'][2]['img_src']}'),
+                            //   SizedBox(width: 14),
+                            //   Book(height: 115, coverUrl: '${renderObject['book_group_info'][3]['img_src']}'),
+                            //   SizedBox(width: 14),
+                            // ],
                           ),
                         ),
                       )

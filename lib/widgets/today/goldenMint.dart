@@ -20,7 +20,7 @@ class _GoldenMintState extends State<GoldenMint> {
   void initState() {
     void getRenderInfo(id)async {
       var result = await HttpUtils.request(
-        '/get_gold_info?r_id=$id',
+        '/api_get_gold_info?r_id=$id',
         method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -30,7 +30,7 @@ class _GoldenMintState extends State<GoldenMint> {
       });
     }
     void getCookie()async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getRenderInfo(cookies[0].value);
     }
     getCookie();

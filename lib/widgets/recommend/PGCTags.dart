@@ -21,9 +21,9 @@ class _PGCTagsState extends State<PGCTags> {
     if (widget.sTag == '浅荷话题') {
       return GestureDetector(
         onTap: () async{
-          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
           cookies.add(new Cookie('article', widget.pId));
-          (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+          (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
           Navigator.pushNamed(context, '/article');
         },
         child: Container(
@@ -53,9 +53,9 @@ class _PGCTagsState extends State<PGCTags> {
     } else if (widget.sTag == 'Mint News') {
       return GestureDetector(
         onTap: ()async{
-          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
           cookies.add(new Cookie('article', widget.pId));
-          (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+          (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
           Navigator.pushNamed(context, '/article');
         },
         child: Container(
@@ -115,9 +115,9 @@ class _PGCTagsState extends State<PGCTags> {
     } else {
       return GestureDetector(
         onTap: ()async{
-          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
           cookies.add(new Cookie('article', widget.pId));
-          (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+          (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
           Navigator.pushNamed(context, '/article');
         },
         child: Container(

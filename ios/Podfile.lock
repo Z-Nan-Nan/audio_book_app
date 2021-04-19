@@ -1,11 +1,15 @@
 PODS:
+  - alarm_calendar (0.0.3):
+    - Flutter
   - audioplayers (0.0.1):
     - Flutter
   - connectivity (0.0.1):
     - Flutter
     - Reachability
   - Flutter (1.0.0)
-  - image_gallery_saver (0.0.1):
+  - image_gallery_saver (1.5.0):
+    - Flutter
+  - image_picker (0.0.1):
     - Flutter
   - path_provider (0.0.1):
     - Flutter
@@ -16,10 +20,12 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - alarm_calendar (from `.symlinks/plugins/alarm_calendar/ios`)
   - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
   - Flutter (from `Flutter`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
+  - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
@@ -29,6 +35,8 @@ SPEC REPOS:
     - Reachability
 
 EXTERNAL SOURCES:
+  alarm_calendar:
+    :path: ".symlinks/plugins/alarm_calendar/ios"
   audioplayers:
     :path: ".symlinks/plugins/audioplayers/ios"
   connectivity:
@@ -37,6 +45,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   image_gallery_saver:
     :path: ".symlinks/plugins/image_gallery_saver/ios"
+  image_picker:
+    :path: ".symlinks/plugins/image_picker/ios"
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   permission_handler:
@@ -45,15 +55,17 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
 
 SPEC CHECKSUMS:
+  alarm_calendar: ec57bf439c7cc79b0144dee41e7fb0b326e8ed61
   audioplayers: 84f968cea3f2deab00ec4f8ff53358b3c0b3992c
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  image_gallery_saver: 1798f45aab0db52c4a2a161409c361340a19908e
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
+  image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: 7022f8972d2d85ce95c1040db945f28bdbfa45d1
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: adb00cec7b0eabb3be819164c29b992d03802cb4
 
 COCOAPODS: 1.10.1

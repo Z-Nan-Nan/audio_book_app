@@ -31,7 +31,7 @@ class _QuestionState extends State<Question> {
   void initState(){
     void getRenderInfo(value,book) async {
       var res = await HttpUtils.request(
-        '/get_question_info?a_id=$value&book_id=$book',
+        '/api_get_question_info?a_id=$value&book_id=$book',
         method: HttpUtils.GET
       );
       var result = DataTransfer.fromJSON(res);
@@ -49,7 +49,7 @@ class _QuestionState extends State<Question> {
       });
     }
     void getCookie() async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       setState(() {
         userRId = cookies[0].value;
       });
@@ -449,7 +449,7 @@ class _QuestionState extends State<Question> {
                           option = 3;
                         });
                         if (lastOne) {
-                          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                          List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                           setState(() {
                             userRId = cookies[0].value;
                           });
@@ -464,7 +464,7 @@ class _QuestionState extends State<Question> {
                             }
                           }
                           var result = await HttpUtils.request(
-                            '/send_read_info',
+                            '/api_send_read_info',
                           method: HttpUtils.POST,
                           data: {
                             'r_id': userRId,

@@ -44,9 +44,9 @@ class _BookListState extends State<BookList> {
   List <Books> booksList = [];
   int vocCount = 0;
   sendShoppingCartInfo(id, buy) async {
-    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
     var result = await HttpUtils.request(
-        '/post_shoppingcart_info',
+        '/api_post_shoppingcart_info',
         method: HttpUtils.POST,
         data: {
           'rId': cookies[0].value,
@@ -63,7 +63,7 @@ class _BookListState extends State<BookList> {
   void initState() {
     void getGroupList(cookie) async {
       var result = await HttpUtils.request(
-          '/get_book_grouplist',
+          '/api_get_book_grouplist',
           method: HttpUtils.POST,
           data: {
             'r_id': cookie.value
@@ -86,7 +86,7 @@ class _BookListState extends State<BookList> {
       widget.countCallBack(count);
     }
     void getCookie() async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getGroupList(cookies[0]);
     }
     getCookie();
@@ -122,7 +122,7 @@ class _BookListState extends State<BookList> {
           children: booksList.map((item){
             return GestureDetector(
               onTap: ()async{
-                List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                 bool flag = true;
                 for (var i in cookies) {
                   if (i.name == 'is_visit_book_group') {
@@ -132,7 +132,7 @@ class _BookListState extends State<BookList> {
                 }
                 if (flag) {
                   cookies.add(new Cookie('is_visit_book_group', item.groupId));
-                  (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                  (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                 }
                 Navigator.pushNamed(context, '/courseInfo');
               },

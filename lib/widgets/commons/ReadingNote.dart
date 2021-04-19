@@ -15,7 +15,7 @@ class _ReadingNoteState extends State<ReadingNote> {
   void initState(){
     void getRenderInfo(id) async{
       var res = await HttpUtils.request(
-        '/get_note_info?r_id=$id',
+        '/api_get_note_info?r_id=$id',
         method: HttpUtils.GET
       );
       var result = DataTransfer.fromJSON(res);
@@ -30,7 +30,7 @@ class _ReadingNoteState extends State<ReadingNote> {
       });
     }
     void getCookie() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getRenderInfo(cookies[0].value);
     }
     getCookie();

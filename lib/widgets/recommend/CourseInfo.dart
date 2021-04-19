@@ -35,7 +35,7 @@ class _CourseInfoState extends State<CourseInfo> {
     void getCourseDetail(cookie, id) async {
       print(cookie.value);
       var result = await HttpUtils.request(
-        '/get_course_info_detail?r_id=${cookie.value}&group_id=$id',
+        '/api_get_course_info_detail?r_id=${cookie.value}&group_id=$id',
         method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -45,7 +45,7 @@ class _CourseInfoState extends State<CourseInfo> {
       });
     }
     void getCookie() async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       var id = '';
       for (var i in cookies) {
         if (i.name == 'is_visit_book_group') {

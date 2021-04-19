@@ -21,7 +21,7 @@ class _ShoppingBagState extends State<ShoppingBag> {
   void initState() {
     void getGroupList(cookie) async {
       var result = await HttpUtils.request(
-          '/get_book_grouplist',
+          '/api_get_book_grouplist',
           method: HttpUtils.POST,
           data: {
             'r_id': cookie.value
@@ -44,7 +44,7 @@ class _ShoppingBagState extends State<ShoppingBag> {
       });
     }
     void getCookie() async {
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getGroupList(cookies[0]);
     }
     getCookie();
@@ -264,12 +264,12 @@ class _ShoppingBagState extends State<ShoppingBag> {
                                   ),
                                   child: Text(isManage ? '删除' : '去结算', style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14),),
                                   onPressed: ()async{
-                                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                    List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                     if (isManage) {
                                       for (var i in booksList) {
                                         if (i.buy == true) {
                                           var res = HttpUtils.request(
-                                            '/post_shoppingcart_info',
+                                            '/api_post_shoppingcart_info',
                                             method: HttpUtils.POST,
                                             data: {
                                               'rId': cookies[0].value,
@@ -281,7 +281,7 @@ class _ShoppingBagState extends State<ShoppingBag> {
                                       }
                                     } else {
                                       var res = await HttpUtils.request(
-                                          '/clear_shopping',
+                                          '/api_clear_shopping',
                                           method: HttpUtils.POST,
                                           data: {
                                             'r_id': cookies[0].value

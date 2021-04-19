@@ -36,7 +36,8 @@ class _ShareBookState extends State<ShareBook> {
     Uint8List pngBytes = byteData.buffer.asUint8List();
     // final result = await ImageGallerySaver.saveImage(pngBytes,
     //     quality: 60, name: "分享图片");
-    final result = await ImageGallerySaver.save(pngBytes);
+    // final result = await ImageGallerySaver.save(pngBytes);
+    final result = await ImageGallerySaver.saveImage(pngBytes);
     if (result) {
       print('ok');
       // toast("保存成功", wring: false);
@@ -83,7 +84,7 @@ class _ShareBookState extends State<ShareBook> {
   void initState() {
     void getRenderInfo(info, book) async{
       var result = await HttpUtils.request(
-          '/get_share_book_info?r_id=$info&book_id=$book',
+          '/api_get_share_book_info?r_id=$info&book_id=$book',
           method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -93,7 +94,7 @@ class _ShareBookState extends State<ShareBook> {
       });
     }
     void getCookie() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       for (var item in cookies) {
         if (item.name == 'share_book_id') {
           getRenderInfo(cookies[0].value, item.value);

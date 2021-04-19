@@ -23,7 +23,7 @@ class _TodayState extends State<Today> {
   void initState() {
     void test() async {
       var res = await HttpUtils.request(
-          '/get_audio_book_data',
+          '/api_get_audio_book_data',
           method: HttpUtils.GET
       );
       var result = DataTransfer.fromJSON(res);
@@ -32,7 +32,7 @@ class _TodayState extends State<Today> {
     void getUserInfo(cookies) async {
       print(cookies[0].value);
       var result = await HttpUtils.request(
-          '/get_user_today_info',
+          '/api_get_user_today_info',
           method: HttpUtils.POST,
           data: {
             'rId': cookies[0].value
@@ -57,7 +57,7 @@ class _TodayState extends State<Today> {
       }
     }
     void getCookie() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       if (cookies.length == 0) {
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Login()), (route) => route == null);
       } else {
@@ -67,35 +67,6 @@ class _TodayState extends State<Today> {
     getCookie();
     super.initState();
   }
-  // List<Course> courses = [
-  //   Course.fromJSON({
-  //     'chapterLabel': 'Chapter 15',
-  //     'bookName': 'One Day',
-  //     'termName': '第1期',
-  //     'cover': 'https://ali.baicizhan.com/readin/images/2020081311083151.jpeg',
-  //     'isDone': true
-  //   }),
-  //   Course.fromJSON({
-  //     'chapterLabel': 'Chapter 41',
-  //     'bookName': '你当像鸟飞往你的山',
-  //     'termName': '第2期',
-  //     'cover': 'https://ali.baicizhan.com/readin/images/2020060517233085.jpeg',
-  //     'isDone': false
-  //   }),
-  //   Course.fromJSON({
-  //     'chapterLabel': 'Chapter 7',
-  //     'bookName': '第十二夜',
-  //     'termName': '第3期',
-  //     'cover': 'https://ali.baicizhan.com/readin/images/2020051117451690.jpg',
-  //     'isDone': false
-  //   }),
-  //   Course.fromJSON({
-  //     'chapterLabel': 'Chapter 22',
-  //     'bookName': '弗兰肯斯坦',
-  //     'termName': '第4期',
-  //     'cover': 'https://ali.baicizhan.com/readin/images/202004281128356.jpeg',
-  //     'isDone': false
-  //   })
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil(width: 375, height: 731)..init(context);
@@ -118,11 +89,10 @@ class _TodayState extends State<Today> {
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 15),
                 decoration: BoxDecoration(color: Color(0xFFF1F1F1), borderRadius: BorderRadius.all(Radius.circular(10))),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     isMintFinished ? Image.asset('images/goldenmint_finish.png', width: 36, height: 36) : Image.asset('images/goldCoin.png', width: 36, height: 36),
-                    SizedBox(width: 47),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -132,7 +102,6 @@ class _TodayState extends State<Today> {
                         Text('课后题正确数 ${rightQuestion}/21', style: TextStyle(color: Color(0xFF505050), fontSize: 16, fontWeight: FontWeight.w500))
                       ],
                     ),
-                    SizedBox(width: 53),
                     GestureDetector(
                       onTap: (){
                         Navigator.pushNamed(context, '/goldenMint');

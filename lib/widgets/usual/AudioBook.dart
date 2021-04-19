@@ -218,7 +218,7 @@ class _AudioBookState extends State<AudioBook> {
   @override
   void initState() {
     void getRenderInfo() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       setState(() {
         rId = cookies[0].value;
       });
@@ -228,8 +228,15 @@ class _AudioBookState extends State<AudioBook> {
           bookId = i.value;
         }
       }
+      var articleId = '';
+      for (var i in cookies) {
+        if (i.name == 'select_article') {
+          articleId = i.value == '' ? '1' : i.value;
+        }
+      }
+      print(articleId);
       var res = await HttpUtils.request(
-        '/get_audio_book_info?b_id=$bookId&a_id=a_0001&r_id=${cookies[0].value}',
+        '/api_get_audio_book_info?b_id=$bookId&a_id=a_00${int.parse(articleId) > 9 ? articleId : '0'}${int.parse(articleId) < 10 ? articleId : ''}&r_id=${cookies[0].value}',
         method: HttpUtils.GET
       );
       var result = DataTransfer.fromJSON(res);
@@ -391,7 +398,7 @@ class _AudioBookState extends State<AudioBook> {
                                         SizedBox(height: 12),
                                         GestureDetector(
                                           onTap: ()async{
-                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                             bool flag = true;
                                             for (var i in cookies) {
                                               if (i.name == 'articleId') {
@@ -402,7 +409,7 @@ class _AudioBookState extends State<AudioBook> {
                                             if (flag) {
                                               cookies.add(new Cookie('articleId', selectArticle));
                                             }
-                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                            (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                             Navigator.pushNamed(context, '/question');
                                           },
                                           child: Container(
@@ -609,7 +616,7 @@ class _AudioBookState extends State<AudioBook> {
                                                     isSecond = 0;
                                                     selectArticle = 'a_00${int.parse(item) > 10 ? '' : '0'}$item';
                                                   });
-                                                  List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                                  List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                                   var bookId = '';
                                                   for (var i in cookies) {
                                                     if (i.name == 'select_book') {
@@ -617,7 +624,7 @@ class _AudioBookState extends State<AudioBook> {
                                                     }
                                                   }
                                                   var res = await HttpUtils.request(
-                                                      '/get_audio_book_info?b_id=$bookId&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item&r_id=$rId',
+                                                      '/api_get_audio_book_info?b_id=$bookId&a_id=a_00${int.parse(item) > 10 ? '' : '0'}$item&r_id=$rId',
                                                       method: HttpUtils.GET
                                                   );
                                                   var result = DataTransfer.fromJSON(res);
@@ -959,7 +966,7 @@ class _AudioBookState extends State<AudioBook> {
                                       children: [
                                         GestureDetector(
                                           onTap: ()async {
-                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                            List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                             var bookId = '';
                                             for (var i in cookies) {
                                               print(i.name);
@@ -968,7 +975,7 @@ class _AudioBookState extends State<AudioBook> {
                                               }
                                             }
                                             var res = await HttpUtils.request(
-                                              '/send_article_note',
+                                              '/api_send_article_note',
                                               method: HttpUtils.POST,
                                               data: {
                                                 'r_id': cookies[0].value,

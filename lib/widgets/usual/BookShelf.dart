@@ -20,7 +20,7 @@ class _BookShelfState extends State<BookShelf> {
   void initState() {
     void getRenderInfo(cookie) async {
       var result = await HttpUtils.request(
-        '/get_user_bookshelf_info?r_id=${cookie}',
+        '/api_get_user_bookshelf_info?r_id=${cookie}',
         method: HttpUtils.GET
       );
       var res = DataTransfer.fromJSON(result);
@@ -32,7 +32,7 @@ class _BookShelfState extends State<BookShelf> {
       });
     }
     void getCookie() async{
-      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
       getRenderInfo(cookies[0].value);
     }
     getCookie();
@@ -69,7 +69,7 @@ class _BookShelfState extends State<BookShelf> {
                                   Book(height: 196, coverUrl: course.cover),
                                   GestureDetector(
                                     onTap: ()async{
-                                      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                      List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                       var flag = true;
                                       for (var i in cookies) {
                                         if (i.name == 'select_book') {
@@ -81,7 +81,7 @@ class _BookShelfState extends State<BookShelf> {
                                         print('yes');
                                         cookies.add(new Cookie('select_book', course.bookId));
                                       }
-                                      (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                      (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                       Navigator.pushNamed(context, '/audioBook');
                                     },
                                     child: Container(
@@ -97,7 +97,7 @@ class _BookShelfState extends State<BookShelf> {
                               SizedBox(height: 6),
                               GestureDetector(
                                 onTap: ()async{
-                                  List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://localhost:3000/login'));
+                                  List<Cookie> cookies = (await Api.cookieJar).loadForRequest(Uri.parse('http://www.routereading.com/api_login'));
                                   bool flag = true;
                                   for (var item in cookies) {
                                     if (item.name == 'share_book_id') {
@@ -108,7 +108,7 @@ class _BookShelfState extends State<BookShelf> {
                                   if (flag) {
                                     cookies.add(new Cookie('share_book_id', course.bookId));
                                   }
-                                  (await Api.cookieJar).saveFromResponse(Uri.parse('http://localhost:3000/login'), cookies);
+                                  (await Api.cookieJar).saveFromResponse(Uri.parse('http://www.routereading.com/api_login'), cookies);
                                   Navigator.pushNamed(context, '/readingResult');
                                 },
                                 child: Row(
